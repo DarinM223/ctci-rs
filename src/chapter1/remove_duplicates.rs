@@ -1,30 +1,27 @@
-use std::collections::HashSet;
-
+/// The trick is instead of "removing" the duplicates you are really
+/// moving nonduplicates to the front, so you look for nonduplicates and insert
+/// them into the current incrementing index.
 pub fn remove_duplicates(s: &mut Vec<u8>) -> usize {
-    let mut set = HashSet::new();
-    let mut index = 0;
-    let mut len = s.len();
-    while index < s.len() {
-        if set.contains(&s[index]) {
-            len -= 1;
+    let mut set = [false; 256];
+    let mut last_updated_index = 0;
+    let mut len = 0;
 
-            let mut second_index = index + 1;
-            while second_index < s.len() && set.contains(&s[second_index]) {
-                second_index += 1;
+    if s.len() < 2 {
+        return s.len();
+    }
+    for curr_index in 1..s.len() {
+        if set[s[last_updated_index] as usize] {
+            if !set[s[curr_index] as usize] {
+                set[s[curr_index] as usize] = true;
+                s[last_updated_index] = s[curr_index];
+                last_updated_index += 1;
+                len += 1;
             }
-            // If there is no nonduplicate after the duplicate character, end here.
-            if second_index >= s.len() {
-                return index;
-            }
-
-            // Swap the characters denoted by the second and first indexes.
-            let temp = s[index];
-            s[index] = s[second_index];
-            s[second_index] = temp;
         } else {
-            set.insert(s[index]);
+            set[s[last_updated_index] as usize] = true;
+            last_updated_index += 1;
+            len += 1;
         }
-        index += 1; 
     }
 
     len
@@ -38,6 +35,19 @@ mod tests {
     fn test_remove_duplicates() {
         let mut s = "abcdaaag".to_string().into_bytes();
         assert_eq!(remove_duplicates(&mut s), 5);
-        assert_eq!(s, "abcdgaaa".to_string().into_bytes());
+        assert_eq!(&s[..5], &"abcdg".to_string().into_bytes()[..]);
+
+        let mut s = "abcdaaga".to_string().into_bytes();
+        assert_eq!(remove_duplicates(&mut s), 5);
+        assert_eq!(&s[..5], &"abcdg".to_string().into_bytes()[..]);
+
+        let mut s = "".to_string().into_bytes();
+        assert_eq!(remove_duplicates(&mut s), 0);
+
+        let mut s = "aaaaa".to_string().into_bytes();
+        assert_eq!(remove_duplicates(&mut s), 1);
+
+        let mut s = "a".to_string().into_bytes();
+        assert_eq!(remove_duplicates(&mut s), 1);
     }
 }
