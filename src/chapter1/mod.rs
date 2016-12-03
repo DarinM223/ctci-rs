@@ -6,3 +6,6 @@ pub mod replace_spaces;
 pub mod rotate_image;
 pub mod zero_matrix;
 pub mod string_rotation;
+pub mod one_away;
+pub mod string_compression;
+pub mod palindrome_permutation;
