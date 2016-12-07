@@ -44,7 +44,7 @@ pub unsafe fn single_linked_list_from_vec<T>(v: Vec<T>) -> *mut Node<T> {
     for elem in v {
         let new_node = Node::new(elem);
 
-        if let Some(tail_ptr) = tail.take() {
+        if let Some(tail_ptr) = tail {
             (*tail_ptr).next = Some(new_node);
             tail = Some(new_node);
         } else {
@@ -56,9 +56,19 @@ pub unsafe fn single_linked_list_from_vec<T>(v: Vec<T>) -> *mut Node<T> {
     head.unwrap()
 }
 
+pub unsafe fn append_list<T>(l: *mut Node<T>, node: *mut Node<T>) {
+    let mut curr = Some(l);
+
+    while !curr.and_then(|n| (*n).next).is_none() {
+        curr = curr.and_then(|n| (*n).next);
+    }
+
+    curr.map(move |n| (*n).next = Some(node));
+}
+
 pub unsafe fn free_single_linked_list<T>(n: *mut Node<T>) {
     let mut curr = Some(n);
-    while let Some(node) = curr.take() {
+    while let Some(node) = curr {
         curr = (*node).next;
         mem::transmute::<*mut Node<T>, Box<Node<T>>>(node);
     }
@@ -69,7 +79,7 @@ pub unsafe fn compare_single_linked_list<T>(n: *mut Node<T>, v: Vec<T>)
 {
     let mut iter = v.into_iter();
     let mut curr = Some(n);
-    while let Some(node) = curr.take() {
+    while let Some(node) = curr {
         assert_eq!((*node).data, iter.next().unwrap());
         curr = (*node).next;
     }

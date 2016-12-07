@@ -7,7 +7,7 @@ pub unsafe fn delete_middle_node<T>(node: *mut Node<T>)
     let mut curr = Some(node);
     let mut next = (*node).next;
 
-    while let Some(next_node) = next.take() {
+    while let Some(next_node) = next {
         curr.map(move |curr_node| {
             (*curr_node).data = (*next_node).data.clone();
         });

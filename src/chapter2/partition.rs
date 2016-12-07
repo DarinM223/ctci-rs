@@ -7,7 +7,7 @@ pub unsafe fn partition<T>(node: *mut Node<T>, value: T) -> *mut Node<T>
     let mut tail = node;
     let mut curr = (*node).next;
 
-    while let Some(n) = curr.take() {
+    while let Some(n) = curr {
         curr = (*n).next;
         if (*n).data < value {
             (*n).next = Some(head);

@@ -9,7 +9,7 @@ pub unsafe fn remove_duplicates<T>(l: *mut Node<T>)
     let mut prev = None;
     let mut curr = Some(l);
     let mut dict = HashMap::new();
-    while let Some(node) = curr.take() {
+    while let Some(node) = curr {
         curr = (*node).next;
         if !dict.contains_key(&(*node).data) {
             dict.insert((*node).data.clone(), true);

@@ -5,7 +5,7 @@ pub unsafe fn find_beginning<T>(l: *mut Node<T>) -> Option<*mut Node<T>> {
     let mut slower = (*l).next;
 
     // Get intersection of the faster and slower nodes.
-    while let (Some(s), Some(f)) = (slower.take(), faster.take()) {
+    while let (Some(s), Some(f)) = (slower, faster) {
         if s == f {
             break;
         }
@@ -22,7 +22,7 @@ pub unsafe fn find_beginning<T>(l: *mut Node<T>) -> Option<*mut Node<T>> {
     // Get intersection starting from the intersected node and the head of the list.
     let mut start = Some(l);
     let mut intersection = faster;
-    while let (Some(s), Some(i)) = (start.take(), intersection.take()) {
+    while let (Some(s), Some(i)) = (start, intersection) {
         if s == i {
             return Some(s);
         }
@@ -31,7 +31,27 @@ pub unsafe fn find_beginning<T>(l: *mut Node<T>) -> Option<*mut Node<T>> {
         intersection = (*i).next;
     }
 
-    None
+    unreachable!()
 }
 
-// TODO(DarinM223): add test cases and helper functions for find_beginning.
+#[cfg(test)]
+mod tests {
+    use super::super::{append_list, single_linked_list_from_vec};
+    use super::*;
+
+    #[test]
+    fn test_find_beginning() {
+        unsafe {
+            let node = single_linked_list_from_vec(vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+            assert_eq!(find_beginning(node), None);
+
+            let mut fourth = Some(node);
+            for _ in 0..3 {
+                fourth = fourth.and_then(|n| (*n).next);
+            }
+            append_list(node, fourth.unwrap());
+
+            assert_eq!(find_beginning(node), fourth);
+        }
+    }
+}

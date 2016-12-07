@@ -8,13 +8,13 @@ pub unsafe fn is_palindrome<T>(node: *mut Node<T>) -> bool
     let mut stack = Vec::new();
 
     let mut curr = Some(node);
-    while let Some(n) = curr.take() {
+    while let Some(n) = curr {
         stack.push((*n).data.clone());
         curr = (*n).next;
     }
 
     let mut curr = Some(node);
-    while let Some(n) = curr.take() {
+    while let Some(n) = curr {
         let data = stack.pop().unwrap();
         if data != (*n).data {
             return false;

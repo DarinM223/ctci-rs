@@ -5,7 +5,7 @@ pub unsafe fn kth_to_last<T>(k: u32, node: *mut Node<T>) -> Option<*mut Node<T>>
     let mut end = Some(node);
 
     for _ in 0..k {
-        end.take().map(|node| end = (*node).next);
+        end.map(|node| end = (*node).next);
     }
     if end.is_none() {
         return None;
@@ -13,7 +13,7 @@ pub unsafe fn kth_to_last<T>(k: u32, node: *mut Node<T>) -> Option<*mut Node<T>>
 
     while let Some(node) = end {
         end = (*node).next;
-        start.take().map(|node| start = (*node).next);
+        start.map(|node| start = (*node).next);
     }
 
     start
