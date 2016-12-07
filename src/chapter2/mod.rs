@@ -3,6 +3,9 @@ pub mod kth_to_last;
 pub mod delete_middle_node;
 pub mod partition;
 pub mod sum_lists;
+pub mod is_palindrome;
+pub mod intersection;
+pub mod loop_detection;
 
 use std::fmt::Debug;
 use std::mem;
