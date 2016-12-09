@@ -1,19 +1,20 @@
-use std::collections::VecDeque;
+use std::collections::{HashSet, VecDeque};
 use super::Node;
 
 pub unsafe fn route_between_nodes<T>(node1: *mut Node<T>, node2: *mut Node<T>) -> bool {
     let mut queue = VecDeque::new();
+    let mut visited = HashSet::new();
 
     queue.push_back(node1);
     while let Some(node) = queue.pop_front() {
-        if !(*node).visited {
+        if !visited.contains(&node) {
             if node == node2 {
                 return true;
             }
             for edge in (*node).edges.iter() {
                 queue.push_back(*edge);
             }
-            (*node).visited = true;
+            visited.insert(node);
         }
     }
 

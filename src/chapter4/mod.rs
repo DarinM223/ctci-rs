@@ -4,7 +4,6 @@ use std::mem;
 
 pub struct Node<T> {
     data: T,
-    visited: bool,
     edges: Vec<*mut Node<T>>,
 }
 
@@ -12,7 +11,6 @@ impl<T> Node<T> {
     pub unsafe fn new(data: T) -> *mut Node<T> {
         let node = Box::new(Node {
             data: data,
-            visited: false,
             edges: Vec::new(),
         });
 
