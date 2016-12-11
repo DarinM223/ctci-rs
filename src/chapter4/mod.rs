@@ -1,6 +1,10 @@
 pub mod route_between_nodes;
+pub mod min_tree;
+pub mod list_of_depths;
+pub mod check_balanced;
 
 use std::mem;
+use std::cmp;
 
 pub struct Node<T> {
     data: T,
@@ -48,4 +52,22 @@ pub unsafe fn free_graph<T>(n: *mut Node<T>) {
     }
 
     mem::transmute::<*mut Node<T>, Box<Node<T>>>(n);
+}
+
+#[derive(PartialEq, Debug, Clone)]
+pub struct Tree<T> {
+    data: T,
+    left: Option<Box<Tree<T>>>,
+    right: Option<Box<Tree<T>>>,
+}
+
+pub fn tree_height<T>(tree: Option<&Box<Tree<T>>>) -> usize {
+    if tree.is_none() {
+        return 0;
+    }
+
+    let left = tree_height(tree.and_then(|n| n.left.as_ref()));
+    let right = tree_height(tree.and_then(|n| n.right.as_ref()));
+
+    cmp::max(left, right) + 1
 }
