@@ -2,6 +2,8 @@ pub mod route_between_nodes;
 pub mod min_tree;
 pub mod list_of_depths;
 pub mod check_balanced;
+pub mod validate_bst;
+pub mod successor;
 
 use std::mem;
 use std::cmp;
