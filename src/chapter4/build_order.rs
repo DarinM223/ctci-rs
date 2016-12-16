@@ -3,7 +3,7 @@ use super::Node;
 
 pub unsafe fn find_projects(projects: Vec<String>,
                             dependencies: Vec<(String, String)>)
-                            -> Option<Vec<*mut Node<String>>> {
+                            -> Vec<*mut Node<String>> {
     let mut graph = Graph::build(projects, dependencies);
     order_projects(&mut graph)
 }
@@ -45,44 +45,42 @@ impl Graph {
     pub fn add_edge(&mut self, start: String, end: String) {
         if let (Some(n1), Some(n2)) = (self.map.get(&start).clone(), self.map.get(&end).clone()) {
             unsafe {
-                (**n1).edges.push(*n2);
-            }
-
-            if self.dependencies.contains_key(&n2) {
-                *self.dependencies.get_mut(&n2).unwrap() += 1;
-            } else {
-                self.dependencies.insert(*n2, 1);
+                // Check if the node already has the edge before adding it.
+                if !(**n1).edges.contains(n2) {
+                    (**n1).edges.push(*n2);
+                    self.dependencies.get_mut(&n2).map(|d| *d += 1);
+                }
             }
         }
     }
 }
 
-unsafe fn order_projects(graph: &mut Graph) -> Option<Vec<*mut Node<String>>> {
+unsafe fn order_projects(graph: &mut Graph) -> Vec<*mut Node<String>> {
     let mut order = Vec::with_capacity(graph.nodes.len());
-    add_non_dependant(&mut order, &graph.nodes, &graph.dependencies);
+
+    // Add the root nodes with no dependencies.
+    add_non_dependants(&mut order, &graph.nodes, &graph.dependencies);
 
     let mut order_index = 0;
     while order_index < order.len() {
-        let project = if let Some(project) = order.get(order_index) {
-            *project
-        } else {
-            return None;
-        };
+        let project = order[order_index];
 
+        // Decrement the children's dependencies and add
+        // the children with no dependencies.
         for child in (*project).edges.iter() {
             graph.dependencies.get_mut(child).map(|d| *d -= 1);
         }
+        add_non_dependants(&mut order, &(*project).edges, &graph.dependencies);
 
-        add_non_dependant(&mut order, &(*project).edges, &graph.dependencies);
         order_index += 1;
     }
 
-    Some(order)
+    order
 }
 
-unsafe fn add_non_dependant(order: &mut Vec<*mut Node<String>>,
-                            projects: &Vec<*mut Node<String>>,
-                            dependencies: &HashMap<*mut Node<String>, u32>) {
+unsafe fn add_non_dependants(order: &mut Vec<*mut Node<String>>,
+                             projects: &Vec<*mut Node<String>>,
+                             dependencies: &HashMap<*mut Node<String>, u32>) {
     for project in projects.iter() {
         let num_dependants = dependencies.get(project).cloned().unwrap_or(0);
         if num_dependants == 0 {
@@ -93,7 +91,26 @@ unsafe fn add_non_dependant(order: &mut Vec<*mut Node<String>>,
 
 #[cfg(test)]
 mod tests {
+    use std::mem;
+    use super::super::Node;
     use super::*;
+
+    /// Helper function for testing the topological sort.
+    fn test_expected(projects: Vec<String>,
+                     edges: Vec<(String, String)>,
+                     expected_output: Vec<String>) {
+        unsafe {
+            let nodes = find_projects(projects, edges);
+            assert_eq!(nodes.len(), expected_output.len());
+
+            for (node, expected) in nodes.into_iter().zip(expected_output.into_iter()) {
+                assert_eq!((*node).data, expected);
+
+                // Free the node.
+                mem::transmute::<*mut Node<String>, Box<Node<String>>>(node);
+            }
+        }
+    }
 
     #[test]
     fn test_basic_example() {
@@ -106,14 +123,29 @@ mod tests {
         let expected_output: Vec<_> =
             vec!["e", "f", "b", "a", "d", "c"].iter().map(|s| s.to_string()).collect();
 
-        unsafe {
-            let nodes = find_projects(projects, edges);
-            assert!(nodes.is_some());
-            assert_eq!(nodes.as_ref().map(|n| n.len()), Some(expected_output.len()));
+        test_expected(projects, edges, expected_output);
+    }
 
-            for (node, expected) in nodes.unwrap().into_iter().zip(expected_output.into_iter()) {
-                assert_eq!((*node).data, expected);
-            }
-        }
+    #[test]
+    fn test_repeated_edges() {
+        let projects: Vec<_> = vec!["a", "b"].iter().map(|s| s.to_string()).collect();
+        let edges: Vec<_> = vec![("a", "b"), ("a", "b"), ("a", "b")]
+            .iter()
+            .map(|&(a, b)| (a.to_string(), b.to_string()))
+            .collect();
+        let expected_output: Vec<_> = vec!["a", "b"].iter().map(|s| s.to_string()).collect();
+
+        test_expected(projects, edges, expected_output);
+    }
+
+    #[test]
+    fn test_cycle() {
+        let projects: Vec<_> = vec!["a", "b", "c"].iter().map(|s| s.to_string()).collect();
+        let edges: Vec<_> = vec![("a", "b"), ("b", "c"), ("c", "a")]
+            .iter()
+            .map(|&(a, b)| (a.to_string(), b.to_string()))
+            .collect();
+
+        test_expected(projects, edges, vec![]);
     }
 }
