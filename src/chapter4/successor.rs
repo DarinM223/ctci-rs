@@ -86,13 +86,13 @@ mod tests {
     fn test_inorder_successor_leftmost() {
         unsafe {
             let tree = Node::new(8);
-            let eleven_node = Node::new_with_parent(11, Some(tree), false);
+            let _ = Node::new_with_parent(11, Some(tree), false);
             let three_node = Node::new_with_parent(3, Some(tree), true);
-            let one_node = Node::new_with_parent(1, Some(three_node), true);
+            let _ = Node::new_with_parent(1, Some(three_node), true);
             let four_node = Node::new_with_parent(4, Some(three_node), false);
             let six_node = Node::new_with_parent(6, Some(four_node), false);
             let five_node = Node::new_with_parent(5, Some(six_node), true);
-            let seven_node = Node::new_with_parent(7, Some(six_node), false);
+            let _ = Node::new_with_parent(7, Some(six_node), false);
 
             assert_eq!(inorder_successor(four_node), Some(five_node));
 
@@ -104,9 +104,9 @@ mod tests {
     fn test_inorder_successor_parent() {
         unsafe {
             let tree = Node::new(8);
-            let eleven_node = Node::new_with_parent(11, Some(tree), false);
+            let _ = Node::new_with_parent(11, Some(tree), false);
             let three_node = Node::new_with_parent(3, Some(tree), true);
-            let one_node = Node::new_with_parent(1, Some(three_node), true);
+            let _ = Node::new_with_parent(1, Some(three_node), true);
             let four_node = Node::new_with_parent(4, Some(three_node), false);
             let five_node = Node::new_with_parent(5, Some(four_node), false);
 

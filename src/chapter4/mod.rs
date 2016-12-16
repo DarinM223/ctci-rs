@@ -4,6 +4,7 @@ pub mod list_of_depths;
 pub mod check_balanced;
 pub mod validate_bst;
 pub mod successor;
+pub mod build_order;
 
 use std::mem;
 use std::cmp;
