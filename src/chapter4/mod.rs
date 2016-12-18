@@ -5,10 +5,12 @@ pub mod check_balanced;
 pub mod validate_bst;
 pub mod successor;
 pub mod build_order;
+pub mod first_common_ancestor;
 
 use std::mem;
 use std::cmp;
 
+/// A graph node for an adjacency list graph structure.
 pub struct Node<T> {
     data: T,
     edges: Vec<*mut Node<T>>,
@@ -23,6 +25,63 @@ impl<T> Node<T> {
 
         mem::transmute::<Box<Node<T>>, *mut Node<T>>(node)
     }
+}
+
+/// A tree node that also contains a pointer to the parent node.
+pub struct TreeNode<T> {
+    data: T,
+    left: Option<*mut TreeNode<T>>,
+    right: Option<*mut TreeNode<T>>,
+    parent: Option<*mut TreeNode<T>>,
+}
+
+impl<T> TreeNode<T> {
+    pub unsafe fn new(data: T) -> *mut TreeNode<T> {
+        let node = Box::new(TreeNode {
+            data: data,
+            left: None,
+            right: None,
+            parent: None,
+        });
+
+        mem::transmute::<Box<TreeNode<T>>, *mut TreeNode<T>>(node)
+    }
+
+    pub unsafe fn new_with_parent(data: T,
+                                  parent: Option<*mut TreeNode<T>>,
+                                  left: bool)
+                                  -> *mut TreeNode<T> {
+        let node = Box::new(TreeNode {
+            data: data,
+            left: None,
+            right: None,
+            parent: parent,
+        });
+        let node_ptr = mem::transmute::<Box<TreeNode<T>>, *mut TreeNode<T>>(node);
+
+        // Link parent's left or right pointer to the node.
+        parent.map(|p| {
+            if left {
+                (*p).left = Some(node_ptr);
+            } else {
+                (*p).right = Some(node_ptr);
+            }
+        });
+
+        node_ptr
+    }
+}
+
+pub unsafe fn free_tree<T>(tree: *mut TreeNode<T>) {
+    if let Some(left) = (*tree).left {
+        free_tree(left);
+    }
+    if let Some(right) = (*tree).right {
+        free_tree(right);
+    }
+
+    // Free the node.
+    mem::transmute::<*mut TreeNode<T>, Box<TreeNode<T>>>(tree);
 }
 
 /// Builds an adjacency list graph given the node datas and an adjacency matrix
