@@ -6,6 +6,7 @@ pub mod validate_bst;
 pub mod successor;
 pub mod build_order;
 pub mod first_common_ancestor;
+pub mod bst_sequences;
 
 use std::mem;
 use std::cmp;
