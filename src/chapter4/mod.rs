@@ -7,6 +7,7 @@ pub mod successor;
 pub mod build_order;
 pub mod first_common_ancestor;
 pub mod bst_sequences;
+pub mod check_subtree;
 
 use std::mem;
 use std::cmp;
