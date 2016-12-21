@@ -8,6 +8,7 @@ pub mod build_order;
 pub mod first_common_ancestor;
 pub mod bst_sequences;
 pub mod check_subtree;
+pub mod random_node;
 
 use std::mem;
 use std::cmp;
