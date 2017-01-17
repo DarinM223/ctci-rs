@@ -14,11 +14,7 @@ pub unsafe fn sum_lists(l1: Option<*mut Node<i32>>,
     let l2_val = l2.map(|n| (*n).data).unwrap_or(0);
     let result = l1_val + l2_val + carry;
     let digit = result % 10;
-    let new_carry = if result >= 10 {
-        1
-    } else {
-        0
-    };
+    let new_carry = if result >= 10 { 1 } else { 0 };
 
     let node = Node::new(digit);
     if l1.is_some() || l2.is_some() {
@@ -68,11 +64,7 @@ unsafe fn sum_lists_rev_helper(l1: Option<*mut Node<i32>>,
     let l2_val = l2.map(|n| (*n).data).unwrap_or(0);
     let result = l1_val + l2_val + prev_carry;
     let digit = result % 10;
-    let carry = if result >= 10 {
-        1
-    } else {
-        0
-    };
+    let carry = if result >= 10 { 1 } else { 0 };
     let node = Node::new(digit);
     (*node).next = prev_node;
 

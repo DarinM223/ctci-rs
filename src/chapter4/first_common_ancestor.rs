@@ -55,11 +55,7 @@ pub fn common_ancestor<'a, T>(tree: &'a Box<Tree<(u32, T)>>,
                               -> Option<&'a Box<Tree<(u32, T)>>> {
     let (node, finished) = common_ancestor_rec(Some(tree), node1, node2);
 
-    if !finished {
-        None
-    } else {
-        node
-    }
+    if !finished { None } else { node }
 }
 
 fn common_ancestor_rec<'a, T>(tree: Node<'a, T>, node1: u32, node2: u32) -> (Node<'a, T>, bool) {

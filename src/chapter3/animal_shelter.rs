@@ -2,14 +2,8 @@ use std::collections::VecDeque;
 
 #[derive(PartialEq, Debug)]
 pub enum Animal {
-    Dog {
-        name: String,
-        id: u32,
-    },
-    Cat {
-        name: String,
-        id: u32,
-    },
+    Dog { name: String, id: u32 },
+    Cat { name: String, id: u32 },
 }
 
 impl Animal {
