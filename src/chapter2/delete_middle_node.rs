@@ -1,4 +1,3 @@
-use std::mem;
 use super::Node;
 
 pub unsafe fn delete_middle_node<T>(node: *mut Node<T>)
@@ -15,7 +14,7 @@ pub unsafe fn delete_middle_node<T>(node: *mut Node<T>)
         if (*next_node).next.is_none() {
             curr.map(|curr_node| (*curr_node).next = None);
             // Free the last node.
-            mem::transmute::<*mut Node<T>, Box<Node<T>>>(next_node);
+            Box::from_raw(next_node);
             break;
         }
 

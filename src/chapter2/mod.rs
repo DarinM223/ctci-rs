@@ -8,7 +8,6 @@ pub mod intersection;
 pub mod loop_detection;
 
 use std::fmt::Debug;
-use std::mem;
 
 /// A singly-linked list node.
 pub struct Node<T> {
@@ -23,7 +22,7 @@ impl<T> Node<T> {
             next: None,
         });
 
-        mem::transmute::<Box<Node<T>>, *mut Node<T>>(new_node)
+        Box::into_raw(new_node)
     }
 }
 
@@ -70,7 +69,7 @@ pub unsafe fn free_single_linked_list<T>(n: *mut Node<T>) {
     let mut curr = Some(n);
     while let Some(node) = curr {
         curr = (*node).next;
-        mem::transmute::<*mut Node<T>, Box<Node<T>>>(node);
+        Box::from_raw(node);
     }
 }
 

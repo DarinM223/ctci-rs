@@ -21,3 +21,24 @@ fn append_to_permutation(permutation: &Vec<u8>, ch: u8, appended_perms: &mut Vec
         appended_perms.push(permutation);
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::collections::HashSet;
+
+    #[test]
+    fn test_permutations() {
+        let s = "Blah".to_string();
+        let perms = permutations(&mut s.into_bytes());
+        let perms_str: Vec<_> =
+            perms.into_iter().map(|perm| String::from_utf8(perm).unwrap()).collect();
+        let mut set = HashSet::new();
+
+        for perm in perms_str {
+            assert!(!set.contains(&perm));
+
+            set.insert(perm);
+        }
+    }
+}

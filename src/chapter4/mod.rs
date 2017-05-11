@@ -11,7 +11,6 @@ pub mod check_subtree;
 pub mod random_node;
 pub mod paths_with_sum;
 
-use std::mem;
 use std::cmp;
 
 /// A graph node for an adjacency list graph structure.
@@ -27,7 +26,7 @@ impl<T> Node<T> {
             edges: Vec::new(),
         });
 
-        mem::transmute::<Box<Node<T>>, *mut Node<T>>(node)
+        Box::into_raw(node)
     }
 }
 
@@ -48,7 +47,7 @@ impl<T> TreeNode<T> {
             parent: None,
         });
 
-        mem::transmute::<Box<TreeNode<T>>, *mut TreeNode<T>>(node)
+        Box::into_raw(node)
     }
 
     pub unsafe fn new_with_parent(data: T,
@@ -61,7 +60,7 @@ impl<T> TreeNode<T> {
             right: None,
             parent: parent,
         });
-        let node_ptr = mem::transmute::<Box<TreeNode<T>>, *mut TreeNode<T>>(node);
+        let node_ptr = Box::into_raw(node);
 
         // Link parent's left or right pointer to the node.
         parent.map(|p| {
@@ -85,7 +84,7 @@ pub unsafe fn free_tree<T>(tree: *mut TreeNode<T>) {
     }
 
     // Free the node.
-    mem::transmute::<*mut TreeNode<T>, Box<TreeNode<T>>>(tree);
+    Box::from_raw(tree);
 }
 
 /// Builds an adjacency list graph given the node datas and an adjacency matrix
@@ -117,7 +116,7 @@ pub unsafe fn free_graph<T>(n: *mut Node<T>) {
         }
     }
 
-    mem::transmute::<*mut Node<T>, Box<Node<T>>>(n);
+    Box::from_raw(n);
 }
 
 #[derive(PartialEq, Debug, Clone)]

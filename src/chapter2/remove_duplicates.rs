@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::hash::Hash;
-use std::mem;
 use super::Node;
 
 pub unsafe fn remove_duplicates<T>(l: *mut Node<T>)
@@ -17,7 +16,7 @@ pub unsafe fn remove_duplicates<T>(l: *mut Node<T>)
         } else {
             prev.map(move |prev| (*prev).next = curr);
             // Free node memory.
-            mem::transmute::<*mut Node<T>, Box<Node<T>>>(node);
+            Box::from_raw(node);
         }
     }
 }

@@ -5,3 +5,6 @@ pub mod power_set;
 pub mod recursive_multiply;
 pub mod tower_of_hanoi;
 pub mod permutations;
+pub mod permutations_dups;
+pub mod parens;
+pub mod coins;

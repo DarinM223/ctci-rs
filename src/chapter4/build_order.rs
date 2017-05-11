@@ -91,7 +91,6 @@ unsafe fn add_non_dependants(order: &mut Vec<*mut Node<String>>,
 
 #[cfg(test)]
 mod tests {
-    use std::mem;
     use super::super::Node;
     use super::*;
 
@@ -107,7 +106,7 @@ mod tests {
                 assert_eq!((*node).data, expected);
 
                 // Free the node.
-                mem::transmute::<*mut Node<String>, Box<Node<String>>>(node);
+                Box::from_raw(node);
             }
         }
     }
