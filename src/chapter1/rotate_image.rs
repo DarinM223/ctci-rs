@@ -86,11 +86,19 @@ mod tests {
         good_rotate_image(&mut matrix);
         assert_eq!(matrix, vec![vec![3, 1], vec![4, 2]]);
 
-        let mut matrix =
-            vec![vec![1, 2, 3, 4], vec![5, 6, 7, 8], vec![9, 10, 11, 12], vec![13, 14, 15, 16]];
+        let mut matrix = vec![
+            vec![1, 2, 3, 4],
+            vec![5, 6, 7, 8],
+            vec![9, 10, 11, 12],
+            vec![13, 14, 15, 16],
+        ];
         good_rotate_image(&mut matrix);
-        let expected =
-            vec![vec![13, 9, 5, 1], vec![14, 10, 6, 2], vec![15, 11, 7, 3], vec![16, 12, 8, 4]];
+        let expected = vec![
+            vec![13, 9, 5, 1],
+            vec![14, 10, 6, 2],
+            vec![15, 11, 7, 3],
+            vec![16, 12, 8, 4],
+        ];
         assert_eq!(matrix, expected);
     }
 }

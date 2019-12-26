@@ -6,11 +6,12 @@ pub struct Dim {
     pub cols: usize,
 }
 
-pub fn get_path(start: Point,
-                end: Point,
-                dim: Dim,
-                offlimits: &Vec<Vec<bool>>)
-                -> Option<Vec<Point>> {
+pub fn get_path(
+    start: Point,
+    end: Point,
+    dim: Dim,
+    offlimits: &Vec<Vec<bool>>,
+) -> Option<Vec<Point>> {
     if start == end {
         Some(vec![start])
     } else if out_of_bounds(start, dim) || off_limits(offlimits, start) {
@@ -25,12 +26,13 @@ pub fn get_path(start: Point,
     }
 }
 
-pub fn get_path_memo(start: Point,
-                     end: Point,
-                     dim: Dim,
-                     offlimits: &Vec<Vec<bool>>,
-                     cache: &mut Vec<Vec<Option<Option<Vec<Point>>>>>)
-                     -> Option<Vec<Point>> {
+pub fn get_path_memo(
+    start: Point,
+    end: Point,
+    dim: Dim,
+    offlimits: &Vec<Vec<bool>>,
+    cache: &mut Vec<Vec<Option<Option<Vec<Point>>>>>,
+) -> Option<Vec<Point>> {
     if start == end {
         Some(vec![start])
     } else if out_of_bounds(start, dim) || off_limits(offlimits, start) {
@@ -73,9 +75,13 @@ mod tests {
 
         let mut cache = vec![vec![None; dim.cols]; dim.rows];
 
-        assert_eq!(get_path((0, 0), (3, 3), dim, &offlimits),
-                   Some(vec![(3, 3), (3, 2), (2, 2), (1, 2), (0, 2), (0, 1), (0, 0)]));
-        assert_eq!(get_path_memo((0, 0), (3, 3), dim, &offlimits, &mut cache),
-                   Some(vec![(3, 3), (3, 2), (2, 2), (1, 2), (0, 2), (0, 1), (0, 0)]));
+        assert_eq!(
+            get_path((0, 0), (3, 3), dim, &offlimits),
+            Some(vec![(3, 3), (3, 2), (2, 2), (1, 2), (0, 2), (0, 1), (0, 0)])
+        );
+        assert_eq!(
+            get_path_memo((0, 0), (3, 3), dim, &offlimits, &mut cache),
+            Some(vec![(3, 3), (3, 2), (2, 2), (1, 2), (0, 2), (0, 1), (0, 0)])
+        );
     }
 }

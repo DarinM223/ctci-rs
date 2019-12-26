@@ -16,7 +16,8 @@ pub struct MultiStack<T> {
 }
 
 impl<T> MultiStack<T>
-    where T: Clone
+where
+    T: Clone,
 {
     pub fn new(capacity: usize) -> MultiStack<T> {
         MultiStack {

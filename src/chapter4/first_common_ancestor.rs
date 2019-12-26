@@ -3,9 +3,10 @@ use super::{Tree, TreeNode};
 /// Solution if the tree nodes are allowed access to the parent.
 /// The solution is similar to the intersection problem in chapter 2 except that the linked lists
 /// are now the tree nodes with the parent pointers.
-pub unsafe fn common_ancestor_parent<T>(node1: *mut TreeNode<T>,
-                                        node2: *mut TreeNode<T>)
-                                        -> Option<*mut TreeNode<T>> {
+pub unsafe fn common_ancestor_parent<T>(
+    node1: *mut TreeNode<T>,
+    node2: *mut TreeNode<T>,
+) -> Option<*mut TreeNode<T>> {
     let n1_size = depth(node1);
     let n2_size = depth(node2);
 
@@ -49,13 +50,18 @@ unsafe fn depth<T>(node: *mut TreeNode<T>) -> i32 {
 type Node<'a, T> = Option<&'a Box<Tree<(u32, T)>>>;
 
 /// Solution if the tree nodes are not allowed access to the parent.
-pub fn common_ancestor<'a, T>(tree: &'a Box<Tree<(u32, T)>>,
-                              node1: u32,
-                              node2: u32)
-                              -> Option<&'a Box<Tree<(u32, T)>>> {
+pub fn common_ancestor<'a, T>(
+    tree: &'a Box<Tree<(u32, T)>>,
+    node1: u32,
+    node2: u32,
+) -> Option<&'a Box<Tree<(u32, T)>>> {
     let (node, finished) = common_ancestor_rec(Some(tree), node1, node2);
 
-    if !finished { None } else { node }
+    if !finished {
+        None
+    } else {
+        node
+    }
 }
 
 fn common_ancestor_rec<'a, T>(tree: Node<'a, T>, node1: u32, node2: u32) -> (Node<'a, T>, bool) {
@@ -88,7 +94,7 @@ fn common_ancestor_rec<'a, T>(tree: Node<'a, T>, node1: u32, node2: u32) -> (Nod
 
 #[cfg(test)]
 mod tests {
-    use super::super::{Tree, TreeNode, free_tree};
+    use super::super::{free_tree, Tree, TreeNode};
     use super::*;
 
     #[test]

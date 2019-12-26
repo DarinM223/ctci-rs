@@ -1,47 +1,64 @@
-use super::Node;
+#[derive(Clone, Debug, PartialEq)]
+pub struct Node<T> {
+    data: T,
+    next: Option<Box<Node<T>>>,
+}
 
-pub unsafe fn delete_middle_node<T>(node: *mut Node<T>)
-    where T: Clone
-{
-    let mut curr = Some(node);
-    let mut next = (*node).next;
-
-    while let Some(next_node) = next {
-        curr.map(move |curr_node| {
-            (*curr_node).data = (*next_node).data.clone();
-        });
-
-        if (*next_node).next.is_none() {
-            curr.map(|curr_node| (*curr_node).next = None);
-            // Free the last node.
-            Box::from_raw(next_node);
-            break;
-        }
-
-        curr = Some(next_node);
-        next = (*next_node).next;
+pub fn delete_middle_node<T>(node: &mut Box<Node<T>>) {
+    if let Some(next) = node.next.take() {
+        node.data = next.data;
+        node.next = next.next;
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::super::{compare_single_linked_list, free_single_linked_list,
-                       single_linked_list_from_vec};
     use super::*;
+
+    fn list_from_vec<T>(v: &mut Vec<T>) -> Box<Node<T>> {
+        let mut node = Box::new(Node {
+            data: v.pop().unwrap(),
+            next: None,
+        });
+        while !v.is_empty() {
+            node = Box::new(Node {
+                data: v.pop().unwrap(),
+                next: Some(node),
+            });
+        }
+
+        node
+    }
+
+    fn vec_from_list<T: Clone>(n: &Box<Node<T>>) -> Vec<T> {
+        let mut vec = Vec::new();
+        fn vec_from_list_iter<T: Clone>(n: &Box<Node<T>>, vec: &mut Vec<T>) {
+            vec.push(n.data.clone());
+            if let Some(next) = n.next.as_ref() {
+                vec_from_list_iter(next, vec);
+            }
+        }
+
+        vec_from_list_iter(&n, &mut vec);
+        vec
+    }
 
     #[test]
     fn test_delete_middle_node() {
-        unsafe {
-            let node = single_linked_list_from_vec(vec![1, 2, 3, 4, 5, 6]);
-            let second_node = (*node).next.unwrap();
+        let mut node = list_from_vec(&mut vec![1, 2, 3, 4, 5, 6]);
+        if let Some(ref mut second_node) = node.next.as_mut() {
             delete_middle_node(second_node);
-            compare_single_linked_list(node, vec![1, 3, 4, 5, 6]);
-
-            let second_to_last_node = (*(*(*node).next.unwrap()).next.unwrap()).next.unwrap();
-            delete_middle_node(second_to_last_node);
-            compare_single_linked_list(node, vec![1, 3, 4, 6]);
-
-            free_single_linked_list(node);
         }
+        assert_eq!(vec_from_list(&node), vec![1, 3, 4, 5, 6]);
+
+        if let Some(ref mut second_to_last_node) = node
+            .next
+            .as_mut()
+            .and_then(|n| n.next.as_mut())
+            .and_then(|n| n.next.as_mut())
+        {
+            delete_middle_node(second_to_last_node);
+        }
+        assert_eq!(vec_from_list(&node), vec![1, 3, 4, 6]);
     }
 }

@@ -19,9 +19,10 @@ pub unsafe fn kth_to_last<T>(k: u32, node: *mut Node<T>) -> Option<*mut Node<T>>
     start
 }
 
-pub unsafe fn kth_to_last_rec<T>(k: u32,
-                                 node: Option<*mut Node<T>>)
-                                 -> (u32, Option<*mut Node<T>>) {
+pub unsafe fn kth_to_last_rec<T>(
+    k: u32,
+    node: Option<*mut Node<T>>,
+) -> (u32, Option<*mut Node<T>>) {
     if node.is_none() {
         return (0, None);
     }
@@ -37,13 +38,15 @@ pub unsafe fn kth_to_last_rec<T>(k: u32,
 
 #[cfg(test)]
 mod tests {
-    use std::fmt::Debug;
-    use super::super::{compare_single_linked_list, free_single_linked_list, Node,
-                       single_linked_list_from_vec};
+    use super::super::{
+        compare_single_linked_list, free_single_linked_list, single_linked_list_from_vec, Node,
+    };
     use super::*;
+    use std::fmt::Debug;
 
     unsafe fn compare_node_data<T>(case: i32, node: Option<*mut Node<T>>, value: Option<T>)
-        where T: PartialEq + Debug
+    where
+        T: PartialEq + Debug,
     {
         if value.is_none() {
             assert!(node.is_none());

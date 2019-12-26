@@ -1,11 +1,12 @@
-use super::{Node, single_linked_list_len};
+use super::{single_linked_list_len, Node};
 
 /// This function is easiest to implement recursively.
 /// The main difficulty is safely handling different sized lists.
-pub unsafe fn sum_lists(l1: Option<*mut Node<i32>>,
-                        l2: Option<*mut Node<i32>>,
-                        carry: i32)
-                        -> Option<*mut Node<i32>> {
+pub unsafe fn sum_lists(
+    l1: Option<*mut Node<i32>>,
+    l2: Option<*mut Node<i32>>,
+    carry: i32,
+) -> Option<*mut Node<i32>> {
     if l1.is_none() && l2.is_none() && carry == 0 {
         return None;
     }
@@ -18,9 +19,11 @@ pub unsafe fn sum_lists(l1: Option<*mut Node<i32>>,
 
     let node = Node::new(digit);
     if l1.is_some() || l2.is_some() {
-        let next_node = sum_lists(l1.and_then(|n| (*n).next),
-                                  l2.and_then(|n| (*n).next),
-                                  new_carry);
+        let next_node = sum_lists(
+            l1.and_then(|n| (*n).next),
+            l2.and_then(|n| (*n).next),
+            new_carry,
+        );
         (*node).next = next_node;
     }
 
@@ -51,15 +54,16 @@ pub unsafe fn sum_lists_rev(l1: *mut Node<i32>, l2: *mut Node<i32>) -> Option<*m
 }
 
 /// Helper function that sums the lists assuming that the lists lengths are the same.
-unsafe fn sum_lists_rev_helper(l1: Option<*mut Node<i32>>,
-                               l2: Option<*mut Node<i32>>)
-                               -> (Option<*mut Node<i32>>, i32) {
+unsafe fn sum_lists_rev_helper(
+    l1: Option<*mut Node<i32>>,
+    l2: Option<*mut Node<i32>>,
+) -> (Option<*mut Node<i32>>, i32) {
     if l1.is_none() && l2.is_none() {
         return (None, 0);
     }
 
-    let (prev_node, prev_carry) = sum_lists_rev_helper(l1.and_then(|n| (*n).next),
-                                                       l2.and_then(|n| (*n).next));
+    let (prev_node, prev_carry) =
+        sum_lists_rev_helper(l1.and_then(|n| (*n).next), l2.and_then(|n| (*n).next));
     let l1_val = l1.map(|n| (*n).data).unwrap_or(0);
     let l2_val = l2.map(|n| (*n).data).unwrap_or(0);
     let result = l1_val + l2_val + prev_carry;
@@ -84,8 +88,9 @@ unsafe fn pad_list(l: *mut Node<i32>, padding: i32) -> *mut Node<i32> {
 
 #[cfg(test)]
 mod tests {
-    use super::super::{compare_single_linked_list, free_single_linked_list,
-                       single_linked_list_from_vec};
+    use super::super::{
+        compare_single_linked_list, free_single_linked_list, single_linked_list_from_vec,
+    };
     use super::*;
 
     #[test]

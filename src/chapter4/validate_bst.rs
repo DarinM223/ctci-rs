@@ -1,13 +1,15 @@
 use super::Tree;
 
 pub fn check_bst<T>(tree: Tree<T>) -> bool
-    where T: PartialOrd + Copy
+where
+    T: PartialOrd + Copy,
 {
     check_bst_rec(Some(&Box::new(tree)), None, None)
 }
 
 fn check_bst_rec<T>(tree: Option<&Box<Tree<T>>>, start: Option<T>, end: Option<T>) -> bool
-    where T: PartialOrd + Copy
+where
+    T: PartialOrd + Copy,
 {
     if let Some(t) = tree {
         let less_range = start.map_or(false, |d| t.data <= d);
@@ -16,8 +18,8 @@ fn check_bst_rec<T>(tree: Option<&Box<Tree<T>>>, start: Option<T>, end: Option<T
         if less_range || greater_range {
             false
         } else {
-            check_bst_rec(t.left.as_ref(), start, Some(t.data.clone())) &&
-            check_bst_rec(t.right.as_ref(), Some(t.data.clone()), end)
+            check_bst_rec(t.left.as_ref(), start, Some(t.data.clone()))
+                && check_bst_rec(t.right.as_ref(), Some(t.data.clone()), end)
         }
     } else {
         true

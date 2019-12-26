@@ -1,7 +1,9 @@
-pub fn move_disks(n: i32,
-                  origin: &mut Vec<i32>,
-                  destination: &mut Vec<i32>,
-                  buffer: &mut Vec<i32>) {
+pub fn move_disks(
+    n: i32,
+    origin: &mut Vec<i32>,
+    destination: &mut Vec<i32>,
+    buffer: &mut Vec<i32>,
+) {
     if n <= 0 {
         return;
     }

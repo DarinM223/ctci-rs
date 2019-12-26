@@ -1,11 +1,11 @@
-pub mod remove_duplicates;
-pub mod kth_to_last;
 pub mod delete_middle_node;
-pub mod partition;
-pub mod sum_lists;
-pub mod is_palindrome;
 pub mod intersection;
+pub mod is_palindrome;
+pub mod kth_to_last;
 pub mod loop_detection;
+pub mod partition;
+pub mod remove_duplicates;
+pub mod sum_lists;
 
 use std::fmt::Debug;
 
@@ -74,7 +74,8 @@ pub unsafe fn free_single_linked_list<T>(n: *mut Node<T>) {
 }
 
 pub unsafe fn compare_single_linked_list<T>(n: *mut Node<T>, v: Vec<T>)
-    where T: Debug + PartialEq
+where
+    T: Debug + PartialEq,
 {
     let mut iter = v.into_iter();
     let mut curr = Some(n);

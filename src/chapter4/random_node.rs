@@ -20,7 +20,8 @@ pub struct RandTree<T: Clone> {
 }
 
 impl<T> RandTree<T>
-    where T: Clone + PartialOrd
+where
+    T: Clone + PartialOrd,
 {
     pub fn new(data: T) -> RandTree<T> {
         RandTree {
@@ -40,7 +41,9 @@ impl<T> RandTree<T>
         } else if i > left_size {
             // Subtract the left nodes from i so that when get_ith is called again
             // on the right node it can correctly check the left node for the size.
-            self.right.as_ref().and_then(|n| n.get_ith(i - (left_size + 1)))
+            self.right
+                .as_ref()
+                .and_then(|n| n.get_ith(i - (left_size + 1)))
         } else {
             Some(self.clone())
         }
@@ -48,7 +51,8 @@ impl<T> RandTree<T>
 }
 
 impl<T> Tree<T> for RandTree<T>
-    where T: Clone + PartialOrd
+where
+    T: Clone + PartialOrd,
 {
     fn data(&self) -> T {
         self.node_data.clone()
@@ -121,15 +125,19 @@ pub struct OptRandTree<T: Clone> {
 }
 
 impl<T> OptRandTree<T>
-    where T: Clone + PartialOrd
+where
+    T: Clone + PartialOrd,
 {
     pub fn new(data: T) -> OptRandTree<T> {
-        OptRandTree { tree: RandTree::new(data) }
+        OptRandTree {
+            tree: RandTree::new(data),
+        }
     }
 }
 
 impl<T> Tree<T> for OptRandTree<T>
-    where T: Clone + PartialOrd
+where
+    T: Clone + PartialOrd,
 {
     fn data(&self) -> T {
         self.tree.data()
@@ -162,10 +170,10 @@ impl<T> Tree<T> for OptRandTree<T>
 mod tests {
     extern crate timebomb;
 
+    use self::timebomb::timeout_ms;
+    use super::*;
     use std::collections::HashSet;
     use std::hash::Hash;
-    use super::*;
-    use self::timebomb::timeout_ms;
 
     fn make_hash_set(arr: Vec<i32>) -> HashSet<i32> {
         let mut set = HashSet::with_capacity(arr.len());
@@ -177,7 +185,8 @@ mod tests {
     }
 
     fn populate_tree<V, T: Tree<V>>(elems: &HashSet<V>, tree: &mut T)
-        where V: Clone + PartialOrd + Hash + Eq
+    where
+        V: Clone + PartialOrd + Hash + Eq,
     {
         for v in elems.iter() {
             tree.insert_in_order(v.clone());
@@ -185,7 +194,8 @@ mod tests {
     }
 
     fn check_random_coverage<V, T: Tree<V>>(elems: &mut HashSet<V>, tree: &T)
-        where V: Clone + PartialOrd + Hash + Eq
+    where
+        V: Clone + PartialOrd + Hash + Eq,
     {
         while !elems.is_empty() {
             let num = tree.random_node().as_ref().map(|n| n.data());
@@ -210,10 +220,12 @@ mod tests {
         assert_eq!(tree.data(), 5);
         assert!(tree.find(9).is_some());
 
-        timeout_ms(move || {
-                       check_random_coverage(&mut set, &tree);
-                   },
-                   3000);
+        timeout_ms(
+            move || {
+                check_random_coverage(&mut set, &tree);
+            },
+            3000,
+        );
     }
 
     #[test]
@@ -227,9 +239,11 @@ mod tests {
         assert_eq!(tree.data(), 5);
         assert!(tree.find(9).is_some());
 
-        timeout_ms(move || {
-                       check_random_coverage(&mut set, &tree);
-                   },
-                   3000);
+        timeout_ms(
+            move || {
+                check_random_coverage(&mut set, &tree);
+            },
+            3000,
+        );
     }
 }

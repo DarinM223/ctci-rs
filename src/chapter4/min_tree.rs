@@ -1,14 +1,16 @@
 use super::Tree;
 
 pub fn min_tree<T>(arr: &Vec<T>) -> Option<Box<Tree<T>>>
-    where T: Clone
+where
+    T: Clone,
 {
     min_tree_rec(arr, 0, arr.len() as i32 - 1)
 }
 
 /// Note: the start and end indexes must be integers because they can be negative.
 fn min_tree_rec<T>(arr: &Vec<T>, start: i32, end: i32) -> Option<Box<Tree<T>>>
-    where T: Clone
+where
+    T: Clone,
 {
     if end < start {
         return None;

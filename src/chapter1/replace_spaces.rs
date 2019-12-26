@@ -33,7 +33,9 @@ mod tests {
         }
 
         replace_spaces(&mut s, 10);
-        assert_eq!(String::from_utf8(s).unwrap(),
-                   "a%20b%20c%20d%20e%20\u{0}".to_string());
+        assert_eq!(
+            String::from_utf8(s).unwrap(),
+            "a%20b%20c%20d%20e%20\u{0}".to_string()
+        );
     }
 }

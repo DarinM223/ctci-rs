@@ -21,10 +21,12 @@ fn build_freq_table(s: &Vec<u8>) -> HashMap<u8, i32> {
     freq_table
 }
 
-fn get_perms(freq_table: &mut HashMap<u8, i32>,
-             prefix: Vec<u8>,
-             remaining: i32,
-             result: &mut Vec<Vec<u8>>) {
+fn get_perms(
+    freq_table: &mut HashMap<u8, i32>,
+    prefix: Vec<u8>,
+    remaining: i32,
+    result: &mut Vec<Vec<u8>>,
+) {
     if remaining == 0 {
         result.push(prefix);
         return;
@@ -52,8 +54,10 @@ mod tests {
     fn test_permutations_dups() {
         let s = "Hello".to_string();
         let perms = permutations(&mut s.into_bytes());
-        let perms_str: Vec<_> =
-            perms.into_iter().map(|perm| String::from_utf8(perm).unwrap()).collect();
+        let perms_str: Vec<_> = perms
+            .into_iter()
+            .map(|perm| String::from_utf8(perm).unwrap())
+            .collect();
         let mut set = HashSet::new();
 
         for perm in perms_str {

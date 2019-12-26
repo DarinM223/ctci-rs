@@ -1,9 +1,10 @@
+use super::Node;
 use std::collections::HashMap;
 use std::hash::Hash;
-use super::Node;
 
 pub unsafe fn remove_duplicates<T>(l: *mut Node<T>)
-    where T: Hash + Eq + Clone
+where
+    T: Hash + Eq + Clone,
 {
     let mut prev = None;
     let mut curr = Some(l);
@@ -23,8 +24,9 @@ pub unsafe fn remove_duplicates<T>(l: *mut Node<T>)
 
 #[cfg(test)]
 mod tests {
-    use super::super::{compare_single_linked_list, free_single_linked_list,
-                       single_linked_list_from_vec};
+    use super::super::{
+        compare_single_linked_list, free_single_linked_list, single_linked_list_from_vec,
+    };
     use super::*;
 
     #[test]

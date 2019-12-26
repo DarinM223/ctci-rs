@@ -4,7 +4,8 @@ pub struct MinStack<T> {
 }
 
 impl<T> MinStack<T>
-    where T: PartialOrd + Clone
+where
+    T: PartialOrd + Clone,
 {
     pub fn new() -> MinStack<T> {
         MinStack {

@@ -33,18 +33,8 @@ impl AnimalShelter {
     pub fn enqueue(&mut self, animal: Animal) {
         let id = self.id;
         match animal {
-            Animal::Dog { name, .. } => {
-                self.dogs.push_front(Animal::Dog {
-                    name: name,
-                    id: id,
-                })
-            }
-            Animal::Cat { name, .. } => {
-                self.cats.push_front(Animal::Cat {
-                    name: name,
-                    id: id,
-                })
-            }
+            Animal::Dog { name, .. } => self.dogs.push_front(Animal::Dog { name: name, id: id }),
+            Animal::Cat { name, .. } => self.cats.push_front(Animal::Cat { name: name, id: id }),
         }
 
         self.id += 1;
@@ -100,25 +90,33 @@ mod tests {
             id: 0,
         });
 
-        assert_eq!(animal_shelter.dequeue_all(),
-                   Some(Animal::Dog {
-                       name: "Fido".to_string(),
-                       id: 0,
-                   }));
-        assert_eq!(animal_shelter.dequeue_all(),
-                   Some(Animal::Cat {
-                       name: "Neko".to_string(),
-                       id: 1,
-                   }));
-        assert_eq!(animal_shelter.dequeue_all(),
-                   Some(Animal::Cat {
-                       name: "Nyaa".to_string(),
-                       id: 2,
-                   }));
-        assert_eq!(animal_shelter.dequeue_all(),
-                   Some(Animal::Dog {
-                       name: "Woof".to_string(),
-                       id: 3,
-                   }));
+        assert_eq!(
+            animal_shelter.dequeue_all(),
+            Some(Animal::Dog {
+                name: "Fido".to_string(),
+                id: 0,
+            })
+        );
+        assert_eq!(
+            animal_shelter.dequeue_all(),
+            Some(Animal::Cat {
+                name: "Neko".to_string(),
+                id: 1,
+            })
+        );
+        assert_eq!(
+            animal_shelter.dequeue_all(),
+            Some(Animal::Cat {
+                name: "Nyaa".to_string(),
+                id: 2,
+            })
+        );
+        assert_eq!(
+            animal_shelter.dequeue_all(),
+            Some(Animal::Dog {
+                name: "Woof".to_string(),
+                id: 3,
+            })
+        );
     }
 }

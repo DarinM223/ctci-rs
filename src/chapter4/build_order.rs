@@ -1,9 +1,10 @@
-use std::collections::HashMap;
 use super::Node;
+use std::collections::HashMap;
 
-pub unsafe fn find_projects(projects: Vec<String>,
-                            dependencies: Vec<(String, String)>)
-                            -> Vec<*mut Node<String>> {
+pub unsafe fn find_projects(
+    projects: Vec<String>,
+    dependencies: Vec<(String, String)>,
+) -> Vec<*mut Node<String>> {
     let mut graph = Graph::build(projects, dependencies);
     order_projects(&mut graph)
 }
@@ -78,9 +79,11 @@ unsafe fn order_projects(graph: &mut Graph) -> Vec<*mut Node<String>> {
     order
 }
 
-unsafe fn add_non_dependants(order: &mut Vec<*mut Node<String>>,
-                             projects: &Vec<*mut Node<String>>,
-                             dependencies: &HashMap<*mut Node<String>, u32>) {
+unsafe fn add_non_dependants(
+    order: &mut Vec<*mut Node<String>>,
+    projects: &Vec<*mut Node<String>>,
+    dependencies: &HashMap<*mut Node<String>, u32>,
+) {
     for project in projects.iter() {
         let num_dependants = dependencies.get(project).cloned().unwrap_or(0);
         if num_dependants == 0 {
@@ -95,9 +98,11 @@ mod tests {
     use super::*;
 
     /// Helper function for testing the topological sort.
-    fn test_expected(projects: Vec<String>,
-                     edges: Vec<(String, String)>,
-                     expected_output: Vec<String>) {
+    fn test_expected(
+        projects: Vec<String>,
+        edges: Vec<(String, String)>,
+        expected_output: Vec<String>,
+    ) {
         unsafe {
             let nodes = find_projects(projects, edges);
             assert_eq!(nodes.len(), expected_output.len());
@@ -113,14 +118,18 @@ mod tests {
 
     #[test]
     fn test_basic_example() {
-        let projects: Vec<_> =
-            vec!["a", "b", "c", "d", "e", "f"].iter().map(|s| s.to_string()).collect();
+        let projects: Vec<_> = vec!["a", "b", "c", "d", "e", "f"]
+            .iter()
+            .map(|s| s.to_string())
+            .collect();
         let edges: Vec<_> = vec![("a", "d"), ("f", "b"), ("b", "d"), ("f", "a"), ("d", "c")]
             .iter()
             .map(|&(a, b)| (a.to_string(), b.to_string()))
             .collect();
-        let expected_output: Vec<_> =
-            vec!["e", "f", "b", "a", "d", "c"].iter().map(|s| s.to_string()).collect();
+        let expected_output: Vec<_> = vec!["e", "f", "b", "a", "d", "c"]
+            .iter()
+            .map(|s| s.to_string())
+            .collect();
 
         test_expected(projects, edges, expected_output);
     }

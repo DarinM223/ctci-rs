@@ -44,8 +44,9 @@ fn triple_step_memo_rec(steps: i32, memo: &mut Vec<Option<i32>>) -> i32 {
     } else if let Some(cached) = memo[steps as usize] {
         cached
     } else {
-        let count = triple_step_memo_rec(steps - 1, memo) + triple_step_memo_rec(steps - 2, memo) +
-                    triple_step_memo_rec(steps - 3, memo);
+        let count = triple_step_memo_rec(steps - 1, memo)
+            + triple_step_memo_rec(steps - 2, memo)
+            + triple_step_memo_rec(steps - 3, memo);
         memo[steps as usize] = Some(count);
 
         count

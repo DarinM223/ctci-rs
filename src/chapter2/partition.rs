@@ -1,7 +1,8 @@
 use super::Node;
 
 pub unsafe fn partition<T>(node: *mut Node<T>, value: T) -> *mut Node<T>
-    where T: PartialOrd
+where
+    T: PartialOrd,
 {
     let mut head = node;
     let mut tail = node;
@@ -24,8 +25,9 @@ pub unsafe fn partition<T>(node: *mut Node<T>, value: T) -> *mut Node<T>
 
 #[cfg(test)]
 mod tests {
-    use super::super::{compare_single_linked_list, free_single_linked_list,
-                       single_linked_list_from_vec};
+    use super::super::{
+        compare_single_linked_list, free_single_linked_list, single_linked_list_from_vec,
+    };
     use super::*;
 
     #[test]

@@ -3,7 +3,8 @@ use super::Node;
 /// Uses a stack to save the linked list data so that popping from
 /// the stack will give the reversed data one at a time.
 pub unsafe fn is_palindrome<T>(node: *mut Node<T>) -> bool
-    where T: PartialEq + Clone
+where
+    T: PartialEq + Clone,
 {
     let mut stack = Vec::new();
 
@@ -27,8 +28,9 @@ pub unsafe fn is_palindrome<T>(node: *mut Node<T>) -> bool
 
 #[cfg(test)]
 mod tests {
-    use super::super::{compare_single_linked_list, free_single_linked_list,
-                       single_linked_list_from_vec};
+    use super::super::{
+        compare_single_linked_list, free_single_linked_list, single_linked_list_from_vec,
+    };
     use super::*;
 
     #[test]

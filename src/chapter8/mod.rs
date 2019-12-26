@@ -1,10 +1,10 @@
-pub mod triple_step;
-pub mod robot_in_grid;
+pub mod coins;
 pub mod magic_index;
-pub mod power_set;
-pub mod recursive_multiply;
-pub mod tower_of_hanoi;
+pub mod parens;
 pub mod permutations;
 pub mod permutations_dups;
-pub mod parens;
-pub mod coins;
+pub mod power_set;
+pub mod recursive_multiply;
+pub mod robot_in_grid;
+pub mod tower_of_hanoi;
+pub mod triple_step;

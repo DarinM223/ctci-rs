@@ -1,6 +1,6 @@
+use super::Tree;
 use std::cmp;
 use std::result;
-use super::Tree;
 
 pub fn is_balanced<T>(root: Tree<T>) -> bool {
     check_height(Some(&Box::new(root))).is_ok()

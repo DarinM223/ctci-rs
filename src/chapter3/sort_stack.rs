@@ -1,7 +1,8 @@
 use std::mem;
 
 pub fn sort_stack<T>(stack: &mut Vec<T>)
-    where T: PartialOrd
+where
+    T: PartialOrd,
 {
     let mut temp_stack = Vec::with_capacity(stack.len());
     while let Some(elem) = stack.pop() {

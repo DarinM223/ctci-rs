@@ -26,14 +26,18 @@ mod tests {
     fn test_get_subsets() {
         let set = vec![1, 2, 3];
 
-        assert_eq!(get_subsets(&set, 0),
-                   vec![vec![],
-                        vec![3],
-                        vec![2],
-                        vec![3, 2],
-                        vec![1],
-                        vec![3, 1],
-                        vec![2, 1],
-                        vec![3, 2, 1]]);
+        assert_eq!(
+            get_subsets(&set, 0),
+            vec![
+                vec![],
+                vec![3],
+                vec![2],
+                vec![3, 2],
+                vec![1],
+                vec![3, 1],
+                vec![2, 1],
+                vec![3, 2, 1]
+            ]
+        );
     }
 }

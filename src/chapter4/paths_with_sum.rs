@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use super::Tree;
+use std::collections::HashMap;
 
 /// Brute force O(nlogn) recursive algorithm that counts the number of paths
 /// starting from the root node, then recursively calls itself on its left and right child
@@ -39,11 +39,12 @@ pub fn paths_with_sum_opt(tree: Option<&Box<Tree<i32>>>, target_sum: i32) -> i32
     paths_with_sum_opt_rec(tree, target_sum, 0, &mut HashMap::new())
 }
 
-fn paths_with_sum_opt_rec(tree: Option<&Box<Tree<i32>>>,
-                          target_sum: i32,
-                          running_sum: i32,
-                          path_count: &mut HashMap<i32, i32>)
-                          -> i32 {
+fn paths_with_sum_opt_rec(
+    tree: Option<&Box<Tree<i32>>>,
+    target_sum: i32,
+    running_sum: i32,
+    path_count: &mut HashMap<i32, i32>,
+) -> i32 {
     if let Some(node) = tree {
         let running_sum = running_sum + node.data;
         let sum = running_sum - target_sum;
@@ -118,7 +119,9 @@ mod tests {
             })),
         });
 
-        assert_eq!(paths_with_sum(Some(&tree), 8),
-                   paths_with_sum_opt(Some(&tree), 8));
+        assert_eq!(
+            paths_with_sum(Some(&tree), 8),
+            paths_with_sum_opt(Some(&tree), 8)
+        );
     }
 }

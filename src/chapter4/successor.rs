@@ -23,7 +23,7 @@ pub unsafe fn inorder_successor<T>(tree: *mut TreeNode<T>) -> Option<*mut TreeNo
 
 #[cfg(test)]
 mod tests {
-    use super::super::{TreeNode, free_tree};
+    use super::super::{free_tree, TreeNode};
     use super::*;
 
     #[test]
