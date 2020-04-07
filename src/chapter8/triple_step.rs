@@ -18,7 +18,7 @@ pub fn triple_step_bottom_up(steps: i32) -> i32 {
         } else {
             let mut count_steps = 0;
             let possible_steps = [1, 2, 3];
-            for step_amount in possible_steps.into_iter() {
+            for step_amount in possible_steps.iter() {
                 if curr_steps - step_amount >= 0 {
                     count_steps += cached_steps[(curr_steps - step_amount) as usize];
                 }

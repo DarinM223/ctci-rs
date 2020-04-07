@@ -1,7 +1,7 @@
 #[derive(Clone, Debug, PartialEq)]
 pub struct Node<T> {
-    data: T,
-    next: Option<Box<Node<T>>>,
+    pub data: T,
+    pub next: Option<Box<Node<T>>>,
 }
 
 pub fn delete_middle_node<T>(node: &mut Box<Node<T>>) {
@@ -20,9 +20,9 @@ mod tests {
             data: v.pop().unwrap(),
             next: None,
         });
-        while !v.is_empty() {
+        while let Some(data) = v.pop() {
             node = Box::new(Node {
-                data: v.pop().unwrap(),
+                data,
                 next: Some(node),
             });
         }

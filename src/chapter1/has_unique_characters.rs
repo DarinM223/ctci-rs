@@ -26,7 +26,7 @@ pub fn has_all_unique_chars_no_data(s: String) -> bool {
             return false;
         }
 
-        set = set | (1 << letter);
+        set |= 1 << letter;
     }
 
     true
