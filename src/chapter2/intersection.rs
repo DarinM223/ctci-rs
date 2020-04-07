@@ -1,10 +1,26 @@
 #[derive(Debug, Clone, Copy)]
 pub struct Node<'a, T> {
-    data: T,
-    next: Option<&'a Node<'a, T>>,
+    pub data: T,
+    pub next: Option<&'a Node<'a, T>>,
 }
 
 pub type Ref<'a, T> = Option<&'a Node<'a, T>>;
+
+#[macro_export]
+macro_rules! ref_list {
+    ($x:expr) => {{
+        Some(&Node {
+            data: $x,
+            next: None,
+        })
+    }};
+    ($x:expr, $($rest:tt)*) => {{
+        Some(&Node {
+            data: $x,
+            next: ref_list!($($rest)*),
+        })
+    }};
+}
 
 pub fn as_ptr<'a, T>(r: Ref<'a, T>) -> Option<*const Node<'a, T>> {
     r.map(|n| n as *const Node<'a, T>)

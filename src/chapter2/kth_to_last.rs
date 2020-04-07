@@ -1,33 +1,30 @@
-use super::Node;
+use super::intersection::Ref;
 
-pub unsafe fn kth_to_last<T>(k: u32, node: *mut Node<T>) -> Option<*mut Node<T>> {
-    let mut start = Some(node);
-    let mut end = Some(node);
+pub fn kth_to_last<'a, T>(k: u32, node: Ref<'a, T>) -> Ref<'a, T> {
+    let mut start = node;
+    let mut end = node;
 
     for _ in 0..k {
-        end.map(|node| end = (*node).next);
+        end = end.and_then(|n| n.next);
     }
     if end.is_none() {
         return None;
     }
 
     while let Some(node) = end {
-        end = (*node).next;
-        start.map(|node| start = (*node).next);
+        end = node.next;
+        start = start.and_then(|n| n.next);
     }
 
     start
 }
 
-pub unsafe fn kth_to_last_rec<T>(
-    k: u32,
-    node: Option<*mut Node<T>>,
-) -> (u32, Option<*mut Node<T>>) {
+pub fn kth_to_last_rec<'a, T>(k: u32, node: Ref<'a, T>) -> (u32, Ref<'a, T>) {
     if node.is_none() {
         return (0, None);
     }
 
-    let (prev_count, prev_node) = kth_to_last_rec(k, node.and_then(|node| (*node).next));
+    let (prev_count, prev_node) = kth_to_last_rec(k, node.and_then(|n| n.next));
     let count = prev_count + 1;
     if count == k {
         (count, node)
@@ -38,52 +35,29 @@ pub unsafe fn kth_to_last_rec<T>(
 
 #[cfg(test)]
 mod tests {
-    use super::super::{
-        compare_single_linked_list, free_single_linked_list, single_linked_list_from_vec, Node,
-    };
-    use super::*;
-    use std::fmt::Debug;
-
-    unsafe fn compare_node_data<T>(case: i32, node: Option<*mut Node<T>>, value: Option<T>)
-    where
-        T: PartialEq + Debug,
-    {
-        if value.is_none() {
-            assert!(node.is_none());
-            return;
-        }
-
-        let node = node.expect(format!("Error unwrapping node for case: {}", case).as_str());
-        let value = value.expect(format!("Error unwrapping value for case: {}", case).as_str());
-
-        assert_eq!((*node).data, value);
-    }
+    use super::super::intersection::{Node, Ref};
+    use super::{kth_to_last, kth_to_last_rec};
+    use crate::ref_list;
 
     #[test]
     fn test_kth_to_last() {
-        unsafe {
-            let node = single_linked_list_from_vec(vec![1, 2, 1, 1, 3, 2, 5]);
-            compare_single_linked_list(node, vec![1, 2, 1, 1, 3, 2, 5]);
-            compare_node_data(0, kth_to_last(3, node), Some(3));
-            compare_node_data(1, kth_to_last(2, node), Some(2));
-            compare_node_data(2, kth_to_last(1, node), Some(5));
-            compare_node_data(3, kth_to_last(0, node), None);
-            compare_single_linked_list(node, vec![1, 2, 1, 1, 3, 2, 5]);
-            free_single_linked_list(node);
-        }
+        let node = ref_list!(1, 2, 1, 1, 3, 2, 5);
+        assert_eq!(kth_to_last(3, node).map(|n| n.data), Some(3));
+        assert_eq!(kth_to_last(2, node).map(|n| n.data), Some(2));
+        assert_eq!(kth_to_last(1, node).map(|n| n.data), Some(5));
+        assert_eq!(kth_to_last(0, node).map(|n| n.data), None);
+        let empty: Ref<i32> = None;
+        assert_eq!(kth_to_last(1, empty).map(|n| n.data), None);
     }
 
     #[test]
     fn test_kth_to_last_rec() {
-        unsafe {
-            let node = single_linked_list_from_vec(vec![1, 2, 1, 1, 3, 2, 5]);
-            compare_single_linked_list(node, vec![1, 2, 1, 1, 3, 2, 5]);
-            compare_node_data(0, kth_to_last_rec(3, Some(node)).1, Some(3));
-            compare_node_data(1, kth_to_last_rec(2, Some(node)).1, Some(2));
-            compare_node_data(2, kth_to_last_rec(1, Some(node)).1, Some(5));
-            compare_node_data(3, kth_to_last_rec(0, Some(node)).1, None);
-            compare_single_linked_list(node, vec![1, 2, 1, 1, 3, 2, 5]);
-            free_single_linked_list(node);
-        }
+        let node = ref_list!(1, 2, 1, 1, 3, 2, 5);
+        assert_eq!(kth_to_last_rec(3, node).1.map(|n| n.data), Some(3));
+        assert_eq!(kth_to_last_rec(2, node).1.map(|n| n.data), Some(2));
+        assert_eq!(kth_to_last_rec(1, node).1.map(|n| n.data), Some(5));
+        assert_eq!(kth_to_last_rec(0, node).1.map(|n| n.data), None);
+        let empty: Ref<i32> = None;
+        assert_eq!(kth_to_last_rec(1, empty).1.map(|n| n.data), None);
     }
 }
