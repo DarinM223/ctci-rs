@@ -1,42 +1,38 @@
-use super::Node;
-use std::collections::HashMap;
+use super::delete_middle_node::Node;
+use std::collections::HashSet;
 use std::hash::Hash;
 
-pub unsafe fn remove_duplicates<T>(l: *mut Node<T>)
+pub fn remove_duplicates<T>(l: Option<Box<Node<T>>>) -> Option<Box<Node<T>>>
 where
     T: Hash + Eq + Clone,
 {
-    let mut prev = None;
-    let mut curr = Some(l);
-    let mut dict = HashMap::new();
-    while let Some(node) = curr {
-        curr = (*node).next;
-        if !dict.contains_key(&(*node).data) {
-            dict.insert((*node).data.clone(), true);
-            prev = Some(node);
+    remove_duplicates_rec(l, &mut HashSet::new())
+}
+
+fn remove_duplicates_rec<T: Hash + Eq + Clone>(
+    l: Option<Box<Node<T>>>,
+    set: &mut HashSet<T>,
+) -> Option<Box<Node<T>>> {
+    l.and_then(|mut node| {
+        if !set.contains(&node.data) {
+            set.insert(node.data.clone());
+            node.next = remove_duplicates_rec(node.next, set);
+            Some(node)
         } else {
-            prev.map(move |prev| (*prev).next = curr);
-            // Free node memory.
-            Box::from_raw(node);
+            remove_duplicates_rec(node.next, set)
         }
-    }
+    })
 }
 
 #[cfg(test)]
 mod tests {
-    use super::super::{
-        compare_single_linked_list, free_single_linked_list, single_linked_list_from_vec,
-    };
+    use super::super::delete_middle_node::{list_from_vec, vec_from_list};
     use super::*;
 
     #[test]
     fn test_remove_duplicates() {
-        unsafe {
-            let node = single_linked_list_from_vec(vec![1, 2, 1, 1, 3, 2, 5]);
-            compare_single_linked_list(node, vec![1, 2, 1, 1, 3, 2, 5]);
-            remove_duplicates(node);
-            compare_single_linked_list(node, vec![1, 2, 3, 5]);
-            free_single_linked_list(node);
-        }
+        let list = list_from_vec(&mut vec![1, 2, 1, 1, 3, 2, 5]);
+        let list_without_duplicates = remove_duplicates(Some(list)).unwrap();
+        assert_eq!(vec_from_list(&list_without_duplicates), vec![1, 2, 3, 5]);
     }
 }
