@@ -1,24 +1,77 @@
-use super::{Tree, TreeNode};
+use super::Tree;
+use slotmap::{new_key_type, SlotMap};
+
+new_key_type! { pub struct TreeKey; }
+impl TreeKey {
+    pub fn left<T>(self, nodes: &SlotMap<TreeKey, TreeNode<T>>) -> Option<TreeKey> {
+        nodes.get(self).and_then(|n| n.left)
+    }
+
+    pub fn right<T>(self, nodes: &SlotMap<TreeKey, TreeNode<T>>) -> Option<TreeKey> {
+        nodes.get(self).and_then(|n| n.right)
+    }
+
+    pub fn parent<T>(self, nodes: &SlotMap<TreeKey, TreeNode<T>>) -> Option<TreeKey> {
+        nodes.get(self).and_then(|n| n.parent)
+    }
+
+    pub fn new<T>(data: T, nodes: &mut SlotMap<TreeKey, TreeNode<T>>) -> TreeKey {
+        let node = TreeNode {
+            data,
+            left: None,
+            right: None,
+            parent: None,
+        };
+        nodes.insert(node)
+    }
+
+    pub fn new_with_parent<T>(
+        data: T,
+        parent: TreeKey,
+        left: bool,
+        nodes: &mut SlotMap<TreeKey, TreeNode<T>>,
+    ) -> TreeKey {
+        let node = TreeNode {
+            data,
+            left: None,
+            right: None,
+            parent: Some(parent),
+        };
+        let node_key = nodes.insert(node);
+        if left {
+            nodes[parent].left = Some(node_key);
+        } else {
+            nodes[parent].right = Some(node_key);
+        }
+        node_key
+    }
+}
+
+pub struct TreeNode<T> {
+    pub data: T,
+    pub left: Option<TreeKey>,
+    pub right: Option<TreeKey>,
+    pub parent: Option<TreeKey>,
+}
 
 /// Solution if the tree nodes are allowed access to the parent.
 /// The solution is similar to the intersection problem in chapter 2 except that the linked lists
 /// are now the tree nodes with the parent pointers.
-pub unsafe fn common_ancestor_parent<T>(
-    node1: *mut TreeNode<T>,
-    node2: *mut TreeNode<T>,
-) -> Option<*mut TreeNode<T>> {
-    let n1_size = depth(node1);
-    let n2_size = depth(node2);
-
-    let (mut bigger, mut smaller) = if n1_size > n2_size {
-        (Some(node1), Some(node2))
+pub fn common_ancestor_parent<T>(
+    node1: TreeKey,
+    node2: TreeKey,
+    nodes: &SlotMap<TreeKey, TreeNode<T>>,
+) -> Option<TreeKey> {
+    let n1_size = depth(node1, nodes);
+    let n2_size = depth(node2, nodes);
+    let (mut bigger, mut smaller, mut difference) = if n1_size > n2_size {
+        (Some(node1), Some(node2), n1_size - n2_size)
     } else {
-        (Some(node2), Some(node1))
+        (Some(node2), Some(node1), n2_size - n1_size)
     };
 
-    let mut difference = (n1_size - n2_size).abs();
     while difference > 0 {
-        bigger = bigger.and_then(|n| (*n).parent);
+        bigger = bigger.and_then(|n| n.parent(nodes));
         difference -= 1;
     }
 
@@ -27,22 +80,20 @@ pub unsafe fn common_ancestor_parent<T>(
             return Some(bn);
         }
 
-        bigger = (*bn).parent;
-        smaller = (*sn).parent;
+        bigger = bn.parent(nodes);
+        smaller = sn.parent(nodes);
     }
 
     None
 }
 
-unsafe fn depth<T>(node: *mut TreeNode<T>) -> i32 {
+fn depth<T>(node: TreeKey, nodes: &SlotMap<TreeKey, TreeNode<T>>) -> usize {
     let mut depth = 0;
     let mut curr = Some(node);
-
-    while let Some(n) = curr {
+    while let Some(node) = curr {
         depth += 1;
-        curr = (*n).parent;
+        curr = node.parent(nodes);
     }
-
     depth
 }
 
@@ -94,7 +145,6 @@ fn common_ancestor_rec<'a, T>(tree: Node<'a, T>, node1: u32, node2: u32) -> (Nod
 
 #[cfg(test)]
 mod tests {
-    use super::super::{free_tree, Tree, TreeNode};
     use super::*;
 
     #[test]
@@ -138,21 +188,18 @@ mod tests {
 
     #[test]
     fn test_common_ancestor_parent() {
-        unsafe {
-            let tree = TreeNode::new(b'a');
-            let bnode = TreeNode::new_with_parent(b'b', Some(tree), true);
-            let cnode = TreeNode::new_with_parent(b'c', Some(bnode), true);
-            let dnode = TreeNode::new_with_parent(b'd', Some(bnode), false);
-            let enode = TreeNode::new_with_parent(b'e', Some(tree), false);
-            let fnode = TreeNode::new_with_parent(b'f', Some(enode), true);
-            let _ = TreeNode::new_with_parent(b'g', Some(enode), false);
+        let mut nodes = SlotMap::with_key();
+        let tree = TreeKey::new(b'a', &mut nodes);
+        let bnode = TreeKey::new_with_parent(b'b', tree, true, &mut nodes);
+        let cnode = TreeKey::new_with_parent(b'c', bnode, true, &mut nodes);
+        let dnode = TreeKey::new_with_parent(b'd', bnode, false, &mut nodes);
+        let enode = TreeKey::new_with_parent(b'e', tree, false, &mut nodes);
+        let fnode = TreeKey::new_with_parent(b'f', enode, true, &mut nodes);
+        let _ = TreeKey::new_with_parent(b'g', enode, false, &mut nodes);
 
-            assert_eq!(common_ancestor_parent(cnode, dnode), Some(bnode));
-            assert_eq!(common_ancestor_parent(cnode, cnode), Some(cnode));
-            assert_eq!(common_ancestor_parent(cnode, fnode), Some(tree));
-            assert_eq!(common_ancestor_parent(bnode, enode), Some(tree));
-
-            free_tree(tree);
-        }
+        assert_eq!(common_ancestor_parent(cnode, dnode, &nodes), Some(bnode));
+        assert_eq!(common_ancestor_parent(cnode, cnode, &nodes), Some(cnode));
+        assert_eq!(common_ancestor_parent(cnode, fnode, &nodes), Some(tree));
+        assert_eq!(common_ancestor_parent(bnode, enode, &nodes), Some(tree));
     }
 }

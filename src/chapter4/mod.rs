@@ -30,64 +30,6 @@ impl<T> Node<T> {
     }
 }
 
-/// A tree node that also contains a pointer to the parent node.
-pub struct TreeNode<T> {
-    data: T,
-    left: Option<*mut TreeNode<T>>,
-    right: Option<*mut TreeNode<T>>,
-    parent: Option<*mut TreeNode<T>>,
-}
-
-impl<T> TreeNode<T> {
-    pub unsafe fn new(data: T) -> *mut TreeNode<T> {
-        let node = Box::new(TreeNode {
-            data: data,
-            left: None,
-            right: None,
-            parent: None,
-        });
-
-        Box::into_raw(node)
-    }
-
-    pub unsafe fn new_with_parent(
-        data: T,
-        parent: Option<*mut TreeNode<T>>,
-        left: bool,
-    ) -> *mut TreeNode<T> {
-        let node = Box::new(TreeNode {
-            data: data,
-            left: None,
-            right: None,
-            parent: parent,
-        });
-        let node_ptr = Box::into_raw(node);
-
-        // Link parent's left or right pointer to the node.
-        parent.map(|p| {
-            if left {
-                (*p).left = Some(node_ptr);
-            } else {
-                (*p).right = Some(node_ptr);
-            }
-        });
-
-        node_ptr
-    }
-}
-
-pub unsafe fn free_tree<T>(tree: *mut TreeNode<T>) {
-    if let Some(left) = (*tree).left {
-        free_tree(left);
-    }
-    if let Some(right) = (*tree).right {
-        free_tree(right);
-    }
-
-    // Free the node.
-    Box::from_raw(tree);
-}
-
 /// Builds an adjacency list graph given the node datas and an adjacency matrix
 /// that describes the edges between the nodes.
 pub unsafe fn build_graph<T>(
