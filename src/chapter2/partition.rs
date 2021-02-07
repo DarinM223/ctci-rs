@@ -1,22 +1,24 @@
-use super::Node;
+use super::loop_detection::{Node, NodeKey};
+use slotmap::SlotMap;
 
-pub unsafe fn partition<T>(node: *mut Node<T>, value: T) -> *mut Node<T>
+pub fn partition<T>(node: NodeKey, nodes: &mut SlotMap<NodeKey, Node<T>>, value: T) -> NodeKey
 where
     T: PartialOrd,
 {
     let mut head = node;
     let mut tail = node;
-    let mut curr = (*node).next;
+    let mut curr = node.next(nodes);
 
-    while let Some(n) = curr {
-        curr = (*n).next;
-        if (*n).data < value {
-            (*n).next = Some(head);
-            head = n;
+    while let Some(node) = curr {
+        curr = node.next(nodes);
+        let node_value = &mut nodes[node];
+        if node_value.data < value {
+            node_value.next = Some(head);
+            head = node;
         } else {
-            (*n).next = None;
-            (*tail).next = Some(n);
-            tail = n;
+            node_value.next = None;
+            nodes[tail].next = Some(node);
+            tail = node;
         }
     }
 
@@ -25,18 +27,13 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::super::{
-        compare_single_linked_list, free_single_linked_list, single_linked_list_from_vec,
-    };
+    use super::super::loop_detection::{list_from_vec, vec_from_list};
     use super::*;
 
     #[test]
     fn test_partition() {
-        unsafe {
-            let node = single_linked_list_from_vec(vec![3, 5, 8, 5, 10, 2, 1]);
-            let node = partition(node, 5);
-            compare_single_linked_list(node, vec![1, 2, 3, 5, 8, 5, 10]);
-            free_single_linked_list(node);
-        }
+        let (mut slotmap, key) = list_from_vec(vec![3, 5, 8, 5, 10, 2, 1]);
+        let result = partition(key.unwrap(), &mut slotmap, 5);
+        assert_eq!(vec_from_list(result, &slotmap), vec![1, 2, 3, 5, 8, 5, 10]);
     }
 }

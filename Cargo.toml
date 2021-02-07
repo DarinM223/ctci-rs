@@ -6,3 +6,4 @@ authors = ["Darin Minamoto <darinm223@gmail.com>"]
 [dependencies]
 rand = "0.3"
 timebomb = "0.1.2"
+slotmap = "1.0"

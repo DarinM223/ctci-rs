@@ -1,4 +1,5 @@
 extern crate rand;
+extern crate slotmap;
 
 pub mod chapter1;
 pub mod chapter2;
