@@ -1,66 +1,69 @@
-use super::Node;
+use super::{GraphKey, GraphNode, GraphNodes};
 use std::collections::HashMap;
 
-pub unsafe fn find_projects(
+pub fn find_projects(
     projects: Vec<String>,
     dependencies: Vec<(String, String)>,
-) -> Vec<*mut Node<String>> {
-    let mut graph = Graph::build(projects, dependencies);
-    order_projects(&mut graph)
+    nodes: &mut GraphNodes<String>,
+) -> Vec<GraphKey> {
+    let mut graph = Graph::build(projects, dependencies, nodes);
+    order_projects(&mut graph, nodes)
 }
 
 struct Graph {
-    nodes: Vec<*mut Node<String>>,
-    map: HashMap<String, *mut Node<String>>,
-    dependencies: HashMap<*mut Node<String>, u32>,
+    keys: Vec<GraphKey>,
+    map: HashMap<String, GraphKey>,
+    dependencies: HashMap<GraphKey, u32>,
 }
 
 impl Graph {
-    pub fn build(projects: Vec<String>, dependencies: Vec<(String, String)>) -> Graph {
+    pub fn build(
+        projects: Vec<String>,
+        dependencies: Vec<(String, String)>,
+        nodes: &mut GraphNodes<String>,
+    ) -> Graph {
         let mut graph = Graph {
-            nodes: Vec::new(),
-            map: HashMap::new(),
-            dependencies: HashMap::new(),
+            keys: Vec::with_capacity(projects.len()),
+            map: HashMap::with_capacity(projects.len()),
+            dependencies: HashMap::with_capacity(projects.len()),
         };
 
         for project in projects {
-            graph.add_project(project);
+            graph.add_project(project, nodes);
         }
 
         for (start, end) in dependencies {
-            graph.add_edge(start, end);
+            graph.add_edge(start, end, nodes);
         }
 
         graph
     }
 
-    pub fn add_project(&mut self, data: String) {
-        unsafe {
-            let node = Node::new(data);
-            self.nodes.push(node);
-            self.map.insert((*node).data.clone(), node);
-            self.dependencies.insert(node, 0);
-        }
+    pub fn add_project(&mut self, data: String, nodes: &mut GraphNodes<String>) {
+        let node = nodes.insert(GraphNode {
+            data: data.clone(),
+            edges: Vec::new(),
+        });
+        self.keys.push(node);
+        self.map.insert(data, node);
+        self.dependencies.insert(node, 0);
     }
 
-    pub fn add_edge(&mut self, start: String, end: String) {
-        if let (Some(n1), Some(n2)) = (self.map.get(&start).clone(), self.map.get(&end).clone()) {
-            unsafe {
-                // Check if the node already has the edge before adding it.
-                if !(**n1).edges.contains(n2) {
-                    (**n1).edges.push(*n2);
-                    self.dependencies.get_mut(&n2).map(|d| *d += 1);
-                }
+    pub fn add_edge(&mut self, start: String, end: String, nodes: &mut GraphNodes<String>) {
+        if let (Some(&n1), Some(&n2)) = (self.map.get(&start), self.map.get(&end)) {
+            if !nodes[n1].edges.contains(&n2) {
+                nodes[n1].edges.push(n2);
+                self.dependencies.get_mut(&n2).map(|d| *d += 1);
             }
         }
     }
 }
 
-unsafe fn order_projects(graph: &mut Graph) -> Vec<*mut Node<String>> {
-    let mut order = Vec::with_capacity(graph.nodes.len());
+fn order_projects(graph: &mut Graph, nodes: &mut GraphNodes<String>) -> Vec<GraphKey> {
+    let mut order = Vec::with_capacity(graph.keys.len());
 
     // Add the root nodes with no dependencies.
-    add_non_dependants(&mut order, &graph.nodes, &graph.dependencies);
+    add_non_dependants(&mut order, &graph.keys, &graph.dependencies);
 
     let mut order_index = 0;
     while order_index < order.len() {
@@ -68,10 +71,10 @@ unsafe fn order_projects(graph: &mut Graph) -> Vec<*mut Node<String>> {
 
         // Decrement the children's dependencies and add
         // the children with no dependencies.
-        for child in (*project).edges.iter() {
+        for child in nodes[project].edges.iter() {
             graph.dependencies.get_mut(child).map(|d| *d -= 1);
         }
-        add_non_dependants(&mut order, &(*project).edges, &graph.dependencies);
+        add_non_dependants(&mut order, &nodes[project].edges, &graph.dependencies);
 
         order_index += 1;
     }
@@ -79,10 +82,10 @@ unsafe fn order_projects(graph: &mut Graph) -> Vec<*mut Node<String>> {
     order
 }
 
-unsafe fn add_non_dependants(
-    order: &mut Vec<*mut Node<String>>,
-    projects: &Vec<*mut Node<String>>,
-    dependencies: &HashMap<*mut Node<String>, u32>,
+fn add_non_dependants(
+    order: &mut Vec<GraphKey>,
+    projects: &Vec<GraphKey>,
+    dependencies: &HashMap<GraphKey, u32>,
 ) {
     for project in projects.iter() {
         let num_dependants = dependencies.get(project).cloned().unwrap_or(0);
@@ -94,8 +97,8 @@ unsafe fn add_non_dependants(
 
 #[cfg(test)]
 mod tests {
-    use super::super::Node;
     use super::*;
+    use slotmap::SlotMap;
 
     /// Helper function for testing the topological sort.
     fn test_expected(
@@ -103,16 +106,12 @@ mod tests {
         edges: Vec<(String, String)>,
         expected_output: Vec<String>,
     ) {
-        unsafe {
-            let nodes = find_projects(projects, edges);
-            assert_eq!(nodes.len(), expected_output.len());
+        let mut nodes = SlotMap::with_key();
+        let keys = find_projects(projects, edges, &mut nodes);
+        assert_eq!(keys.len(), expected_output.len());
 
-            for (node, expected) in nodes.into_iter().zip(expected_output.into_iter()) {
-                assert_eq!((*node).data, expected);
-
-                // Free the node.
-                Box::from_raw(node);
-            }
+        for (node, expected) in keys.into_iter().zip(expected_output.into_iter()) {
+            assert_eq!(nodes[node].data, expected);
         }
     }
 

@@ -11,57 +11,49 @@ pub mod route_between_nodes;
 pub mod successor;
 pub mod validate_bst;
 
+use slotmap::{new_key_type, SlotMap};
 use std::cmp;
 
+new_key_type! { pub struct GraphKey; }
 /// A graph node for an adjacency list graph structure.
-pub struct Node<T> {
-    data: T,
-    edges: Vec<*mut Node<T>>,
+pub struct GraphNode<T> {
+    pub data: T,
+    pub edges: Vec<GraphKey>,
 }
 
-impl<T> Node<T> {
-    pub unsafe fn new(data: T) -> *mut Node<T> {
-        let node = Box::new(Node {
-            data: data,
-            edges: Vec::new(),
-        });
-
-        Box::into_raw(node)
-    }
-}
+pub type GraphNodes<T> = SlotMap<GraphKey, GraphNode<T>>;
 
 /// Builds an adjacency list graph given the node datas and an adjacency matrix
 /// that describes the edges between the nodes.
-pub unsafe fn build_graph<T>(
-    node_data: Vec<T>,
-    node_edges: Vec<Vec<bool>>,
+pub fn build_graph<T>(
+    data: Vec<T>,
+    edges: Vec<Vec<bool>>,
     return_nodes: Vec<usize>,
-) -> Vec<*mut Node<T>> {
-    let nodes: Vec<_> = node_data.into_iter().map(|data| Node::new(data)).collect();
-    for (i, &node) in nodes.iter().enumerate() {
-        for (j, edge) in node_edges[i].iter().enumerate() {
-            if *edge {
-                (*node).edges.push(nodes[j]);
+    nodes: &mut GraphNodes<T>,
+) -> Vec<GraphKey> {
+    let keys: Vec<GraphKey> = data
+        .into_iter()
+        .map(|data| {
+            nodes.insert(GraphNode {
+                data,
+                edges: Vec::new(),
+            })
+        })
+        .collect();
+
+    for (i, &node) in keys.iter().enumerate() {
+        for (j, &edge) in edges[i].iter().enumerate() {
+            if edge {
+                nodes[node].edges.push(keys[j]);
             }
         }
     }
 
-    nodes
-        .into_iter()
+    keys.into_iter()
         .enumerate()
         .filter(|&(i, _)| return_nodes.contains(&i))
         .map(|(_, n)| n)
         .collect()
-}
-
-pub unsafe fn free_graph<T>(n: *mut Node<T>) {
-    if !(*n).edges.is_empty() {
-        for edge in (*n).edges.iter() {
-            free_graph(*edge);
-        }
-    }
-
-    Box::from_raw(n);
 }
 
 #[derive(PartialEq, Debug, Clone)]
