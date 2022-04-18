@@ -1,5 +1,6 @@
 extern crate rand;
 extern crate slotmap;
+extern crate typed_arena;
 
 pub mod chapter1;
 pub mod chapter2;

@@ -13,6 +13,9 @@ pub mod validate_bst;
 
 use slotmap::{new_key_type, SlotMap};
 use std::cmp;
+use std::fmt::Debug;
+use std::{cell::Cell, ptr};
+use typed_arena::Arena;
 
 new_key_type! { pub struct GraphKey; }
 /// A graph node for an adjacency list graph structure.
@@ -72,4 +75,57 @@ pub fn tree_height<T>(tree: Option<&Box<Tree<T>>>) -> usize {
     let right = tree_height(tree.and_then(|n| n.right.as_ref()));
 
     cmp::max(left, right) + 1
+}
+
+pub struct TreeNode<'a, T> {
+    pub data: T,
+    pub left: Cell<Option<&'a TreeNode<'a, T>>>,
+    pub right: Cell<Option<&'a TreeNode<'a, T>>>,
+    pub parent: Cell<Option<&'a TreeNode<'a, T>>>,
+}
+
+impl<'a, T> TreeNode<'a, T> {
+    pub fn new(data: T, arena: &'a Arena<TreeNode<'a, T>>) -> &'a TreeNode<'a, T> {
+        arena.alloc(TreeNode {
+            data,
+            left: Cell::new(None),
+            right: Cell::new(None),
+            parent: Cell::new(None),
+        })
+    }
+
+    pub fn new_with_parent(
+        data: T,
+        parent: &'a TreeNode<'a, T>,
+        left: bool,
+        arena: &'a Arena<TreeNode<'a, T>>,
+    ) -> &'a TreeNode<'a, T> {
+        let node = arena.alloc(TreeNode {
+            data,
+            left: Cell::new(None),
+            right: Cell::new(None),
+            parent: Cell::new(Some(parent)),
+        });
+        if left {
+            parent.left.set(Some(node));
+        } else {
+            parent.right.set(Some(node));
+        }
+        node
+    }
+}
+
+impl<'a, T> Debug for &'a TreeNode<'a, T>
+where
+    T: Debug,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "TreeNode {{ data: {:?} }}", self.data)
+    }
+}
+
+impl<'a, T> PartialEq for &'a TreeNode<'a, T> {
+    fn eq(&self, other: &Self) -> bool {
+        ptr::eq(*self, *other)
+    }
 }

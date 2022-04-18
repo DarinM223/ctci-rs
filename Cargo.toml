@@ -7,3 +7,4 @@ authors = ["Darin Minamoto <darinm223@gmail.com>"]
 rand = "0.3"
 timebomb = "0.1.2"
 slotmap = "1.0"
+typed-arena = "2.0.1"

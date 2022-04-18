@@ -1,60 +1,56 @@
-use super::first_common_ancestor::{TreeKey, TreeNode};
-use slotmap::SlotMap;
+use super::TreeNode;
 
-pub fn inorder_successor<T>(
-    tree: TreeKey,
-    nodes: &SlotMap<TreeKey, TreeNode<T>>,
-) -> Option<TreeKey> {
-    if let Some(mut node) = tree.right(nodes) {
-        while let Some(left) = node.left(nodes) {
+pub fn inorder_successor<'a, T>(tree: &'a TreeNode<'a, T>) -> Option<&'a TreeNode<'a, T>> {
+    if let Some(mut node) = tree.right.get() {
+        while let Some(left) = node.left.get() {
             node = left;
         }
 
         Some(node)
     } else {
         let mut node = tree;
-        while let Some(parent) = node.parent(nodes) {
-            if parent.right(nodes) == Some(node) {
+        while let Some(parent) = node.parent.get() {
+            if parent.right.get() == Some(node) {
                 node = parent;
             } else {
                 break;
             }
         }
 
-        node.parent(nodes)
+        node.parent.get()
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::super::first_common_ancestor::TreeKey;
     use super::*;
+    use typed_arena::Arena;
 
     #[test]
     fn test_inorder_successor_leftmost() {
-        let mut nodes = SlotMap::with_key();
-        let tree = TreeKey::new(8, &mut nodes);
-        let _ = TreeKey::new_with_parent(11, tree, false, &mut nodes);
-        let three_node = TreeKey::new_with_parent(3, tree, true, &mut nodes);
-        let _ = TreeKey::new_with_parent(1, three_node, true, &mut nodes);
-        let four_node = TreeKey::new_with_parent(4, three_node, false, &mut nodes);
-        let six_node = TreeKey::new_with_parent(6, four_node, false, &mut nodes);
-        let five_node = TreeKey::new_with_parent(5, six_node, true, &mut nodes);
-        let _ = TreeKey::new_with_parent(7, six_node, false, &mut nodes);
+        let arena = Arena::new();
+        let tree = TreeNode::new(8, &arena);
+        let _ = TreeNode::new_with_parent(11, tree, false, &arena);
+        let three_node = TreeNode::new_with_parent(3, tree, true, &arena);
+        let _ = TreeNode::new_with_parent(1, three_node, true, &arena);
+        let four_node = TreeNode::new_with_parent(4, three_node, false, &arena);
+        let six_node = TreeNode::new_with_parent(6, four_node, false, &arena);
+        let five_node = TreeNode::new_with_parent(5, six_node, true, &arena);
+        let _ = TreeNode::new_with_parent(7, six_node, false, &arena);
 
-        assert_eq!(inorder_successor(four_node, &nodes), Some(five_node));
+        assert_eq!(inorder_successor(four_node), Some(five_node));
     }
 
     #[test]
     fn test_inorder_successor_parent() {
-        let mut nodes = SlotMap::with_key();
-        let tree = TreeKey::new(8, &mut nodes);
-        let _ = TreeKey::new_with_parent(11, tree, false, &mut nodes);
-        let three_node = TreeKey::new_with_parent(3, tree, true, &mut nodes);
-        let _ = TreeKey::new_with_parent(1, three_node, true, &mut nodes);
-        let four_node = TreeKey::new_with_parent(4, three_node, false, &mut nodes);
-        let five_node = TreeKey::new_with_parent(5, four_node, false, &mut nodes);
+        let arena = Arena::new();
+        let tree = TreeNode::new(8, &arena);
+        let _ = TreeNode::new_with_parent(11, tree, false, &arena);
+        let three_node = TreeNode::new_with_parent(3, tree, true, &arena);
+        let _ = TreeNode::new_with_parent(1, three_node, true, &arena);
+        let four_node = TreeNode::new_with_parent(4, three_node, false, &arena);
+        let five_node = TreeNode::new_with_parent(5, four_node, false, &arena);
 
-        assert_eq!(inorder_successor(five_node, &nodes), Some(tree));
+        assert_eq!(inorder_successor(five_node), Some(tree));
     }
 }
