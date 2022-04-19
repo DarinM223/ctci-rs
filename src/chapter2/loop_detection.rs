@@ -1,42 +1,52 @@
-use slotmap::{new_key_type, SlotMap};
+use std::fmt::Debug;
+use std::{cell::Cell, ptr};
+use typed_arena::Arena;
 
-new_key_type! { pub struct NodeKey; }
-pub struct Node<T> {
+pub struct Node<'a, T> {
     pub data: T,
-    pub next: Option<NodeKey>,
+    pub next: Cell<Option<&'a Node<'a, T>>>,
 }
 
-impl NodeKey {
-    pub fn next<T>(self, nodes: &SlotMap<NodeKey, Node<T>>) -> Option<NodeKey> {
-        nodes.get(self).and_then(|n| n.next)
+impl<'a, T> Debug for &'a Node<'a, T>
+where
+    T: Debug,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Node {{ data: {:?} }}", self.data)
     }
 }
 
-pub fn list_from_vec<T>(v: Vec<T>) -> (SlotMap<NodeKey, Node<T>>, Option<NodeKey>) {
-    let mut slotmap = SlotMap::with_key();
+impl<'a, T> PartialEq for &'a Node<'a, T> {
+    fn eq(&self, other: &Self) -> bool {
+        ptr::eq(*self, *other)
+    }
+}
+
+pub fn list_from_vec<'a, T>(v: Vec<T>, arena: &'a Arena<Node<'a, T>>) -> Option<&'a Node<'a, T>> {
     let mut prev = None;
     for v in v.into_iter().rev() {
-        prev = Some(slotmap.insert(Node {
+        let node = arena.alloc(Node {
             data: v,
-            next: prev,
-        }));
+            next: Cell::new(prev),
+        });
+        prev = Some(node);
     }
-    (slotmap, prev)
+    prev
 }
 
-pub fn vec_from_list<T: Clone>(node: NodeKey, nodes: &SlotMap<NodeKey, Node<T>>) -> Vec<T> {
+pub fn vec_from_list<'a, T: Clone>(node: &'a Node<'a, T>) -> Vec<T> {
     let mut vec = Vec::new();
     let mut curr_node = Some(node);
     while let Some(node) = curr_node {
-        vec.push(nodes[node].data.clone());
-        curr_node = node.next(nodes);
+        vec.push(node.data.clone());
+        curr_node = node.next.get();
     }
     vec
 }
 
-pub fn find_beginning<T>(l: NodeKey, nodes: &SlotMap<NodeKey, Node<T>>) -> Option<NodeKey> {
-    let mut faster = l.next(nodes).and_then(|n| n.next(nodes));
-    let mut slower = l.next(nodes);
+pub fn find_beginning<'a, T>(l: &'a Node<'a, T>) -> Option<&'a Node<'a, T>> {
+    let mut faster = l.next.get().and_then(|n| n.next.get());
+    let mut slower = l.next.get();
 
     // Get intersection of the faster and slower nodes.
     while let (Some(s), Some(f)) = (slower, faster) {
@@ -44,8 +54,8 @@ pub fn find_beginning<T>(l: NodeKey, nodes: &SlotMap<NodeKey, Node<T>>) -> Optio
             break;
         }
 
-        slower = s.next(nodes);
-        faster = f.next(nodes).and_then(|f| f.next(nodes));
+        slower = s.next.get();
+        faster = f.next.get().and_then(|f| f.next.get());
     }
 
     // Return early if not loop.
@@ -61,8 +71,8 @@ pub fn find_beginning<T>(l: NodeKey, nodes: &SlotMap<NodeKey, Node<T>>) -> Optio
             return Some(s);
         }
 
-        start = s.next(nodes);
-        intersection = i.next(nodes);
+        start = s.next.get();
+        intersection = i.next.get();
     }
 
     unreachable!()
@@ -74,33 +84,35 @@ mod tests {
 
     #[test]
     fn test_list_to_vec() {
+        let arena = Arena::new();
         let v = vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-        let (slotmap, key) = list_from_vec(v.clone());
-        assert_eq!(vec_from_list(key.unwrap(), &slotmap), v);
+        let node = list_from_vec(v.clone(), &arena);
+        assert_eq!(vec_from_list(node.unwrap()), v);
 
         let v: Vec<i32> = Vec::new();
-        let (_, key) = list_from_vec(v.clone());
-        assert_eq!(key, None);
+        let node = list_from_vec(v.clone(), &arena);
+        assert_eq!(node, None);
     }
 
     #[test]
     fn test_find_beginning() {
-        let (mut nodes, node) = list_from_vec(vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
-        assert_eq!(find_beginning(node.unwrap(), &nodes), None);
+        let arena = Arena::new();
+        let node = list_from_vec(vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], &arena);
+        assert_eq!(find_beginning(node.unwrap()), None);
 
         let mut eleventh = node;
         for _ in 0..10 {
-            eleventh = eleventh.and_then(|n| n.next(&nodes));
+            eleventh = eleventh.and_then(|n| n.next.get());
         }
-        assert_eq!(nodes[eleventh.unwrap()].data, 11);
+        assert_eq!(eleventh.unwrap().data, 11);
 
         let mut fifth = node;
         for _ in 0..4 {
-            fifth = fifth.and_then(|n| n.next(&nodes));
+            fifth = fifth.and_then(|n| n.next.get());
         }
-        assert_eq!(nodes[fifth.unwrap()].data, 5);
+        assert_eq!(fifth.unwrap().data, 5);
 
-        nodes[eleventh.unwrap()].next = fifth;
-        assert_eq!(find_beginning(node.unwrap(), &nodes), fifth);
+        eleventh.unwrap().next.set(fifth);
+        assert_eq!(find_beginning(node.unwrap()), fifth);
     }
 }

@@ -1,23 +1,21 @@
-use super::loop_detection::{Node, NodeKey};
-use slotmap::SlotMap;
+use super::loop_detection::Node;
 
-pub fn partition<T>(node: NodeKey, nodes: &mut SlotMap<NodeKey, Node<T>>, value: T) -> NodeKey
+pub fn partition<'a, T>(node: &'a Node<'a, T>, value: T) -> &'a Node<'a, T>
 where
     T: PartialOrd,
 {
     let mut head = node;
     let mut tail = node;
-    let mut curr = node.next(nodes);
+    let mut curr = node.next.get();
 
     while let Some(node) = curr {
-        curr = node.next(nodes);
-        let node_value = &mut nodes[node];
-        if node_value.data < value {
-            node_value.next = Some(head);
+        curr = node.next.get();
+        if node.data < value {
+            node.next.set(Some(head));
             head = node;
         } else {
-            node_value.next = None;
-            nodes[tail].next = Some(node);
+            node.next.set(None);
+            tail.next.set(Some(node));
             tail = node;
         }
     }
@@ -29,11 +27,13 @@ where
 mod tests {
     use super::super::loop_detection::{list_from_vec, vec_from_list};
     use super::*;
+    use typed_arena::Arena;
 
     #[test]
     fn test_partition() {
-        let (mut slotmap, key) = list_from_vec(vec![3, 5, 8, 5, 10, 2, 1]);
-        let result = partition(key.unwrap(), &mut slotmap, 5);
-        assert_eq!(vec_from_list(result, &slotmap), vec![1, 2, 3, 5, 8, 5, 10]);
+        let arena = Arena::new();
+        let node = list_from_vec(vec![3, 5, 8, 5, 10, 2, 1], &arena);
+        let result = partition(node.unwrap(), 5);
+        assert_eq!(vec_from_list(result), vec![1, 2, 3, 5, 8, 5, 10]);
     }
 }
