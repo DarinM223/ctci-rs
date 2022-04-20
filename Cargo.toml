@@ -4,6 +4,7 @@ version = "0.1.0"
 authors = ["Darin Minamoto <darinm223@gmail.com>"]
 
 [dependencies]
+ghost-cell = "0.2.2"
 rand = "0.3"
 timebomb = "0.1.2"
 slotmap = "1.0"

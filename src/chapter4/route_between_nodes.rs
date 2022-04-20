@@ -1,20 +1,32 @@
-use super::{GraphKey, GraphNodes};
-use std::collections::{HashSet, VecDeque};
+use ghost_cell::{GhostCell, GhostToken};
+use std::{
+    collections::{HashSet, VecDeque},
+    ptr,
+};
 
-pub fn route_between_nodes<T>(node1: GraphKey, node2: GraphKey, nodes: &GraphNodes<T>) -> bool {
+pub struct Graph<'arena, 'id, T> {
+    pub data: T,
+    pub edges: Vec<&'arena GhostCell<'id, Graph<'arena, 'id, T>>>,
+}
+
+pub fn route_between_nodes<'arena, 'id, T>(
+    node1: &'arena GhostCell<'id, Graph<'arena, 'id, T>>,
+    node2: &'arena GhostCell<'id, Graph<'arena, 'id, T>>,
+    token: &GhostToken<'id>,
+) -> bool {
     let mut queue = VecDeque::new();
     let mut visited = HashSet::new();
 
     queue.push_back(node1);
     while let Some(node) = queue.pop_front() {
-        if !visited.contains(&node) {
-            if node == node2 {
+        if !visited.contains(&(node as *const _)) {
+            if ptr::eq(node, node2) {
                 return true;
             }
-            for edge in nodes[node].edges.iter() {
-                queue.push_back(*edge);
+            for &edge in node.borrow(token).edges.iter() {
+                queue.push_back(edge);
             }
-            visited.insert(node);
+            visited.insert(node as *const _);
         }
     }
 
@@ -23,26 +35,30 @@ pub fn route_between_nodes<T>(node1: GraphKey, node2: GraphKey, nodes: &GraphNod
 
 #[cfg(test)]
 mod tests {
-    use slotmap::SlotMap;
-
-    use super::super::build_graph;
     use super::*;
+    use typed_arena::Arena;
 
     #[test]
     fn test_route_between_nodes() {
-        let mut nodes = SlotMap::with_key();
-        let keys = build_graph(
-            vec![1, 2, 3],
-            vec![
-                vec![false, false, true],
-                vec![false, false, true],
-                vec![false, false, false],
-            ],
-            vec![0, 1, 2],
-            &mut nodes,
-        );
-        assert_eq!(route_between_nodes(keys[0], keys[2], &nodes), true);
-        assert_eq!(route_between_nodes(keys[1], keys[2], &nodes), true);
-        assert_eq!(route_between_nodes(keys[0], keys[1], &nodes), false);
+        GhostToken::new(|mut token| {
+            let arena = Arena::new();
+            let node1 = GhostCell::from_mut(arena.alloc(Graph {
+                data: 1,
+                edges: Vec::new(),
+            }));
+            let node2 = GhostCell::from_mut(arena.alloc(Graph {
+                data: 2,
+                edges: Vec::new(),
+            }));
+            let node3 = GhostCell::from_mut(arena.alloc(Graph {
+                data: 3,
+                edges: Vec::new(),
+            }));
+            node1.borrow_mut(&mut token).edges.push(node3);
+            node2.borrow_mut(&mut token).edges.push(node3);
+            assert_eq!(route_between_nodes(node1, node3, &token), true);
+            assert_eq!(route_between_nodes(node2, node3, &token), true);
+            assert_eq!(route_between_nodes(node1, node2, &token), false);
+        });
     }
 }

@@ -1,3 +1,4 @@
+extern crate ghost_cell;
 extern crate rand;
 extern crate slotmap;
 extern crate typed_arena;
