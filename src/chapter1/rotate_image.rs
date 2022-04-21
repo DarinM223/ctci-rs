@@ -1,4 +1,4 @@
-fn rotate_swap(matrix: &mut Vec<Vec<i32>>, indexes: &[(usize, usize); 4]) {
+fn rotate_swap(matrix: &mut [Vec<i32>], indexes: &[(usize, usize); 4]) {
     let top_left = matrix[indexes[0].0][indexes[0].1];
     let top_right = matrix[indexes[1].0][indexes[1].1];
     let bottom_right = matrix[indexes[2].0][indexes[2].1];
@@ -10,12 +10,12 @@ fn rotate_swap(matrix: &mut Vec<Vec<i32>>, indexes: &[(usize, usize); 4]) {
     matrix[indexes[0].0][indexes[0].1] = bottom_left;
 }
 
-fn rotate_image_rec(matrix: &mut Vec<Vec<i32>>, n: usize, mut indexes: [(usize, usize); 4]) {
+fn rotate_image_rec(matrix: &mut [Vec<i32>], n: usize, mut indexes: [(usize, usize); 4]) {
     if n <= 1 {
         return;
     }
 
-    let mut old_indexes = indexes.clone();
+    let mut old_indexes = indexes;
 
     for _ in 0..n - 1 {
         rotate_swap(matrix, &indexes);
@@ -40,8 +40,8 @@ fn rotate_image_rec(matrix: &mut Vec<Vec<i32>>, n: usize, mut indexes: [(usize, 
 
 /// My initial rotate image algorithm was a recursive one that recursed over every layer.
 /// There is a lot of unecessary work in moving the four corner indexes every time it recurses.
-pub fn my_rotate_image(matrix: &mut Vec<Vec<i32>>) {
-    if matrix.len() == 0 || matrix.len() != matrix[0].len() {
+pub fn my_rotate_image(matrix: &mut [Vec<i32>]) {
+    if matrix.is_empty() || matrix.len() != matrix[0].len() {
         return;
     }
 
@@ -55,8 +55,8 @@ pub fn my_rotate_image(matrix: &mut Vec<Vec<i32>>) {
     rotate_image_rec(matrix, n, indexes);
 }
 
-pub fn good_rotate_image(matrix: &mut Vec<Vec<i32>>) {
-    if matrix.len() == 0 || matrix.len() != matrix[0].len() {
+pub fn good_rotate_image(matrix: &mut [Vec<i32>]) {
+    if matrix.is_empty() || matrix.len() != matrix[0].len() {
         return;
     }
 

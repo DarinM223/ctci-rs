@@ -84,7 +84,7 @@ fn order_projects(graph: &mut Graph, nodes: &mut GraphNodes<String>) -> Vec<Grap
 
 fn add_non_dependants(
     order: &mut Vec<GraphKey>,
-    projects: &Vec<GraphKey>,
+    projects: &[GraphKey],
     dependencies: &HashMap<GraphKey, u32>,
 ) {
     for project in projects.iter() {

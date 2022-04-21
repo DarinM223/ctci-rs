@@ -1,6 +1,6 @@
 use super::intersection::Ref;
 
-pub fn kth_to_last<'a, T>(k: u32, node: Ref<'a, T>) -> Ref<'a, T> {
+pub fn kth_to_last<T>(k: u32, node: Ref<'_, T>) -> Ref<'_, T> {
     let mut start = node;
     let mut end = node;
 
@@ -19,7 +19,7 @@ pub fn kth_to_last<'a, T>(k: u32, node: Ref<'a, T>) -> Ref<'a, T> {
     start
 }
 
-pub fn kth_to_last_rec<'a, T>(k: u32, node: Ref<'a, T>) -> (u32, Ref<'a, T>) {
+pub fn kth_to_last_rec<T>(k: u32, node: Ref<'_, T>) -> (u32, Ref<'_, T>) {
     if node.is_none() {
         return (0, None);
     }

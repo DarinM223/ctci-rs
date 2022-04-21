@@ -7,7 +7,7 @@ pub fn is_palindrome_permutation(s: String) -> bool {
     let mut even_map: i32 = 0;
 
     for byte in s.bytes() {
-        if byte >= b'a' && byte <= b'z' {
+        if (b'a'..=b'z').contains(&byte) {
             let letter = byte - b'a';
             toggle(&mut even_map, letter as i32);
         }

@@ -18,8 +18,8 @@ where
         if less_range || greater_range {
             false
         } else {
-            check_bst_rec(t.left.as_deref(), start, Some(t.data.clone()))
-                && check_bst_rec(t.right.as_deref(), Some(t.data.clone()), end)
+            check_bst_rec(t.left.as_deref(), start, Some(t.data))
+                && check_bst_rec(t.right.as_deref(), Some(t.data), end)
         }
     } else {
         true

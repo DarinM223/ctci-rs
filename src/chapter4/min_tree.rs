@@ -18,14 +18,10 @@ where
 
     let mid = (start + end) / 2;
     let data = arr[mid as usize].clone();
-    let left = min_tree_rec(&arr, start, mid - 1);
-    let right = min_tree_rec(&arr, mid + 1, end);
+    let left = min_tree_rec(arr, start, mid - 1);
+    let right = min_tree_rec(arr, mid + 1, end);
 
-    Some(Box::new(Tree {
-        data: data,
-        left: left,
-        right: right,
-    }))
+    Some(Box::new(Tree { data, left, right }))
 }
 
 #[cfg(test)]

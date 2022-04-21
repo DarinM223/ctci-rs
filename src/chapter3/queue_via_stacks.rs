@@ -22,7 +22,7 @@ impl<T> StackQueue<T> {
         self.stack_oldest.pop()
     }
 
-    pub fn peek<'a>(&'a mut self) -> Option<&'a T> {
+    pub fn peek(&mut self) -> Option<&T> {
         self.move_newest_to_oldest();
         self.stack_oldest.last()
     }
@@ -31,11 +31,21 @@ impl<T> StackQueue<T> {
         self.stack_newest.len() + self.stack_oldest.len()
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.stack_newest.is_empty() && self.stack_oldest.is_empty()
+    }
+
     fn move_newest_to_oldest(&mut self) {
         if self.stack_oldest.is_empty() {
             self.stack_newest.reverse();
             mem::swap(&mut self.stack_newest, &mut self.stack_oldest);
         }
+    }
+}
+
+impl<T> Default for StackQueue<T> {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -50,11 +60,13 @@ mod tests {
         queue.enqueue(2);
         queue.enqueue(3);
 
+        assert_eq!(queue.is_empty(), false);
         assert_eq!(queue.len(), 3);
         assert_eq!(queue.peek(), Some(&1));
         assert_eq!(queue.dequeue(), Some(1));
         assert_eq!(queue.dequeue(), Some(2));
         assert_eq!(queue.dequeue(), Some(3));
         assert_eq!(queue.dequeue(), None);
+        assert_eq!(queue.is_empty(), true);
     }
 }

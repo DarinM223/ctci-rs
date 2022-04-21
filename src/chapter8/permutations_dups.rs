@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-pub fn permutations(s: &Vec<u8>) -> Vec<Vec<u8>> {
+pub fn permutations(s: &[u8]) -> Vec<Vec<u8>> {
     let mut table = build_freq_table(s);
     let mut result = vec![];
     get_perms(&mut table, vec![], s.len() as i32, &mut result);
@@ -8,7 +8,7 @@ pub fn permutations(s: &Vec<u8>) -> Vec<Vec<u8>> {
     result
 }
 
-fn build_freq_table(s: &Vec<u8>) -> HashMap<u8, i32> {
+fn build_freq_table(s: &[u8]) -> HashMap<u8, i32> {
     let mut freq_table = HashMap::new();
     for byte in s.iter() {
         if !freq_table.contains_key(byte) {

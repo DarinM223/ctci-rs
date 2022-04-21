@@ -55,7 +55,7 @@ where
         Ok(self.array[index].take().unwrap())
     }
 
-    pub fn peek<'a>(&'a mut self, stack: usize) -> Result<&'a T> {
+    pub fn peek(&mut self, stack: usize) -> Result<&T> {
         if stack > 2 {
             return Err(StackError::InvalidStackIndex);
         }

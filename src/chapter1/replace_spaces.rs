@@ -3,7 +3,7 @@
 /// just overwrite the new length indexes with either the normal index character
 /// or "%20" if the normal index character is a space. The new length
 /// has to be large enough so it won't overwrite the existing data.
-pub fn replace_spaces(s: &mut Vec<u8>, len: usize) {
+pub fn replace_spaces(s: &mut [u8], len: usize) {
     let num_spaces = s.iter().take(len).filter(|&&ch| ch != b' ').count();
     let mut new_len = len + (num_spaces * 2);
 

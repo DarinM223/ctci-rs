@@ -33,8 +33,8 @@ impl AnimalShelter {
     pub fn enqueue(&mut self, animal: Animal) {
         let id = self.id;
         match animal {
-            Animal::Dog { name, .. } => self.dogs.push_front(Animal::Dog { name: name, id: id }),
-            Animal::Cat { name, .. } => self.cats.push_front(Animal::Cat { name: name, id: id }),
+            Animal::Dog { name, .. } => self.dogs.push_front(Animal::Dog { name, id }),
+            Animal::Cat { name, .. } => self.cats.push_front(Animal::Cat { name, id }),
         }
 
         self.id += 1;
@@ -63,6 +63,12 @@ impl AnimalShelter {
 
     pub fn dequeue_cat(&mut self) -> Option<Animal> {
         self.cats.pop_back()
+    }
+}
+
+impl Default for AnimalShelter {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

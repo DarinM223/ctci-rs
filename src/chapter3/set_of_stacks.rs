@@ -9,7 +9,7 @@ impl<T> SetOfStacks<T> {
     pub fn new(capacity: usize) -> SetOfStacks<T> {
         SetOfStacks {
             stacks: Vec::new(),
-            capacity: capacity,
+            capacity,
         }
     }
 

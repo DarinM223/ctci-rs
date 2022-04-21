@@ -6,6 +6,7 @@ use rand::distributions::{IndependentSample, Range};
 pub trait Tree<T>: Sized {
     fn data(&self) -> T;
     fn len(&self) -> i32;
+    fn is_empty(&self) -> bool;
     fn random_node(&self) -> Option<Self>;
     fn insert_in_order(&mut self, d: T);
     fn find(&self, d: T) -> Option<Self>;
@@ -62,6 +63,10 @@ where
         self.size
     }
 
+    fn is_empty(&self) -> bool {
+        self.size == 0
+    }
+
     /// Recursive function that returns a truely random node
     /// in the tree (each node has the same probability of coming up).
     ///
@@ -95,12 +100,10 @@ where
             } else {
                 self.left = Some(Box::new(RandTree::new(d)));
             }
+        } else if let Some(ref mut right) = self.right {
+            right.insert_in_order(d);
         } else {
-            if let Some(ref mut right) = self.right {
-                right.insert_in_order(d);
-            } else {
-                self.right = Some(Box::new(RandTree::new(d)));
-            }
+            self.right = Some(Box::new(RandTree::new(d)));
         }
 
         self.size += 1;
@@ -145,6 +148,10 @@ where
 
     fn len(&self) -> i32 {
         self.tree.len()
+    }
+
+    fn is_empty(&self) -> bool {
+        self.tree.is_empty()
     }
 
     /// Generates a random number from 0 to i and

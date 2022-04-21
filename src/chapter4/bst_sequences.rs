@@ -49,19 +49,19 @@ fn weave_lists<T>(
         return;
     }
 
-    first.pop_front().map(|head_first| {
+    if let Some(head_first) = first.pop_front() {
         prefix.push_back(head_first.clone());
         weave_lists(first, second, results, prefix);
         prefix.pop_back();
         first.push_front(head_first);
-    });
+    }
 
-    second.pop_front().map(|head_second| {
+    if let Some(head_second) = second.pop_front() {
         prefix.push_back(head_second.clone());
         weave_lists(first, second, results, prefix);
         prefix.pop_back();
         second.push_front(head_second);
-    });
+    }
 }
 
 #[cfg(test)]

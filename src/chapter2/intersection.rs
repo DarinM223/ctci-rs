@@ -22,8 +22,8 @@ macro_rules! ref_list {
     }};
 }
 
-pub fn as_ptr<'a, T>(r: Ref<'a, T>) -> Option<*const Node<'a, T>> {
-    r.map(|n| n as *const Node<'a, T>)
+pub fn as_ptr<T>(r: Ref<'_, T>) -> Option<*const Node<'_, T>> {
+    r.map(|n| n as *const Node<'_, T>)
 }
 
 pub fn intersection<'a, T>(mut l1: Ref<'a, T>, mut l2: Ref<'a, T>) -> Ref<'a, T> {
@@ -55,7 +55,7 @@ pub fn intersection<'a, T>(mut l1: Ref<'a, T>, mut l2: Ref<'a, T>) -> Ref<'a, T>
     None
 }
 
-fn get_tail_and_size<'a, T>(l: Ref<'a, T>) -> (Ref<'a, T>, i32) {
+fn get_tail_and_size<T>(l: Ref<'_, T>) -> (Ref<'_, T>, i32) {
     let mut curr = l;
     let mut len = 1;
     while curr.and_then(|n| n.next).is_some() {

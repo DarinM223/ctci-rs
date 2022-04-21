@@ -27,23 +27,32 @@ where
 
     pub fn pop(&mut self) -> Option<T> {
         let data = self.stack.pop();
-        if !data.is_none() && data == self.min_stack.last().cloned() {
+        if data.is_some() && data == self.min_stack.last().cloned() {
             self.min_stack.pop();
         }
 
         data
     }
 
-    pub fn peek<'a>(&'a self) -> Option<&'a T> {
+    pub fn peek(&self) -> Option<&T> {
         self.stack.last()
     }
 
-    pub fn min<'a>(&'a self) -> Option<&'a T> {
+    pub fn min(&self) -> Option<&T> {
         self.min_stack.last()
     }
 
     pub fn is_empty(&self) -> bool {
         self.stack.is_empty()
+    }
+}
+
+impl<T> Default for MinStack<T>
+where
+    T: PartialOrd + Clone,
+{
+    fn default() -> Self {
+        Self::new()
     }
 }
 

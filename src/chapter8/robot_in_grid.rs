@@ -6,12 +6,7 @@ pub struct Dim {
     pub cols: usize,
 }
 
-pub fn get_path(
-    start: Point,
-    end: Point,
-    dim: Dim,
-    offlimits: &Vec<Vec<bool>>,
-) -> Option<Vec<Point>> {
+pub fn get_path(start: Point, end: Point, dim: Dim, offlimits: &[Vec<bool>]) -> Option<Vec<Point>> {
     if start == end {
         Some(vec![start])
     } else if out_of_bounds(start, dim) || off_limits(offlimits, start) {
@@ -30,7 +25,7 @@ pub fn get_path_memo(
     start: Point,
     end: Point,
     dim: Dim,
-    offlimits: &Vec<Vec<bool>>,
+    offlimits: &[Vec<bool>],
     cache: &mut Vec<Vec<Option<Option<Vec<Point>>>>>,
 ) -> Option<Vec<Point>> {
     if start == end {
@@ -57,7 +52,7 @@ fn out_of_bounds(point: Point, dim: Dim) -> bool {
     point.0 >= dim.rows || point.1 >= dim.cols
 }
 
-fn off_limits(offlimits: &Vec<Vec<bool>>, pos: Point) -> bool {
+fn off_limits(offlimits: &[Vec<bool>], pos: Point) -> bool {
     offlimits.get(pos.0).and_then(|row| row.get(pos.1)) == Some(&true)
 }
 

@@ -4,7 +4,7 @@
 pub fn has_all_unique_chars(s: String) -> bool {
     let mut set = [false; 256];
     for byte in s.bytes() {
-        if set[byte as usize] == true {
+        if set[byte as usize] {
             return false;
         }
         set[byte as usize] = true;

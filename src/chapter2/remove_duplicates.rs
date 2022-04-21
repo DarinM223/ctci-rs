@@ -32,7 +32,7 @@ mod tests {
     #[test]
     fn test_remove_duplicates() {
         let list = list_from_vec(&mut vec![1, 2, 1, 1, 3, 2, 5]);
-        let list_without_duplicates = remove_duplicates(Some(list)).unwrap();
+        let list_without_duplicates = remove_duplicates(Some(Box::new(list))).unwrap();
         assert_eq!(vec_from_list(&list_without_duplicates), vec![1, 2, 3, 5]);
     }
 }

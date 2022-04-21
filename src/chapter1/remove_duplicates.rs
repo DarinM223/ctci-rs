@@ -1,7 +1,7 @@
 /// The trick is instead of "removing" the duplicates you are really
 /// moving nonduplicates to the front, so you look for nonduplicates and insert
 /// them into the current incrementing index.
-pub fn remove_duplicates(s: &mut Vec<u8>) -> usize {
+pub fn remove_duplicates(s: &mut [u8]) -> usize {
     let mut set = [false; 256];
     let mut last_updated_index = 0;
     let mut len = 0;

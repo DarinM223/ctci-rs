@@ -7,8 +7,8 @@ use std::collections::HashSet;
 /// Space complexity: O(n)
 /// It could be done with O(1) space by keeping rows count and
 /// the columns count in the first row and column.
-pub fn zero_matrix(matrix: &mut Vec<Vec<i32>>) {
-    if matrix.len() == 0 || matrix[0].len() != matrix.len() {
+pub fn zero_matrix(matrix: &mut [Vec<i32>]) {
+    if matrix.is_empty() || matrix[0].len() != matrix.len() {
         return;
     }
 

@@ -11,8 +11,8 @@ pub fn sum_lists(
         return None;
     }
 
-    let l1_val = l1.as_ref().map(|n| n.data).unwrap_or(0);
-    let l2_val = l2.as_ref().map(|n| n.data).unwrap_or(0);
+    let l1_val = l1.as_deref().map(|n| n.data).unwrap_or(0);
+    let l2_val = l2.as_deref().map(|n| n.data).unwrap_or(0);
     let result = l1_val + l2_val + carry;
     let digit = result % 10;
     let new_carry = if result >= 10 { 1 } else { 0 };
@@ -55,10 +55,10 @@ pub fn sum_lists_rev(
 /// Returns the length of the list
 fn list_len(l: &Option<Box<Node<i32>>>) -> usize {
     let mut len = 0;
-    let mut head = l.as_ref();
-    while let Some(ref node) = head {
+    let mut head = l.as_deref();
+    while let Some(node) = head {
         len += 1;
-        head = node.next.as_ref();
+        head = node.next.as_deref();
     }
     len
 }
@@ -105,32 +105,32 @@ mod tests {
 
     #[test]
     fn test_basic_sum_lists() {
-        let l1 = Some(list_from_vec(&mut vec![7, 1, 6]));
-        let l2 = Some(list_from_vec(&mut vec![5, 9, 2]));
+        let l1 = Some(Box::new(list_from_vec(&mut vec![7, 1, 6])));
+        let l2 = Some(Box::new(list_from_vec(&mut vec![5, 9, 2])));
         let sum = sum_lists(l1, l2, 0).unwrap();
         assert_eq!(vec_from_list(&sum), vec![2, 1, 9]);
     }
 
     #[test]
     fn test_different_sizes_sum_lists() {
-        let l1 = Some(list_from_vec(&mut vec![2]));
-        let l2 = Some(list_from_vec(&mut vec![9, 9, 9]));
+        let l1 = Some(Box::new(list_from_vec(&mut vec![2])));
+        let l2 = Some(Box::new(list_from_vec(&mut vec![9, 9, 9])));
         let sum = sum_lists(l1, l2, 0).unwrap();
         assert_eq!(vec_from_list(&sum), vec![1, 0, 0, 1]);
     }
 
     #[test]
     fn test_basic_sum_lists_rev() {
-        let l1 = Some(list_from_vec(&mut vec![6, 1, 7]));
-        let l2 = Some(list_from_vec(&mut vec![2, 9, 5]));
+        let l1 = Some(Box::new(list_from_vec(&mut vec![6, 1, 7])));
+        let l2 = Some(Box::new(list_from_vec(&mut vec![2, 9, 5])));
         let sum = sum_lists_rev(l1, l2).unwrap();
         assert_eq!(vec_from_list(&sum), vec![9, 1, 2]);
     }
 
     #[test]
     fn test_different_sizes_sum_lists_rev() {
-        let l1 = Some(list_from_vec(&mut vec![2]));
-        let l2 = Some(list_from_vec(&mut vec![9, 9, 9]));
+        let l1 = Some(Box::new(list_from_vec(&mut vec![2])));
+        let l2 = Some(Box::new(list_from_vec(&mut vec![9, 9, 9])));
         let sum = sum_lists_rev(l1, l2).unwrap();
         assert_eq!(vec_from_list(&sum), vec![1, 0, 0, 1]);
     }

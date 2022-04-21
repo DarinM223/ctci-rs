@@ -1,8 +1,8 @@
 /// The sorted strings should be equal if the two strings
 /// are anagrams.
 pub fn is_anagram_sort(s1: &mut Vec<u8>, s2: &mut Vec<u8>) -> bool {
-    s1.sort();
-    s2.sort();
+    s1.sort_unstable();
+    s2.sort_unstable();
 
     *s1 == *s2
 }

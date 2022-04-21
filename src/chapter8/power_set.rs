@@ -1,12 +1,12 @@
 /// The trick is to recursively get the subsets of the tail part
 /// of the array and then clone the subsets and append the head to every cloned
 /// subset and merge them with the normal subsets.
-pub fn get_subsets(set: &Vec<i32>, index: usize) -> Vec<Vec<i32>> {
+pub fn get_subsets(set: &[i32], index: usize) -> Vec<Vec<i32>> {
     if set.len() == index {
         vec![vec![]]
     } else {
         let mut all_subsets = get_subsets(set, index + 1);
-        let item = *set.get(index).clone().unwrap();
+        let item = set[index];
 
         let mut more_subsets = all_subsets.clone();
         for subset in more_subsets.iter_mut() {
