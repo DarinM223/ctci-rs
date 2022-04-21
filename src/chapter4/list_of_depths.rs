@@ -1,20 +1,20 @@
 use super::{tree_height, Tree};
 use std::collections::VecDeque;
 
-pub fn list_of_depths<T>(tree: Tree<T>) -> Vec<Vec<Box<Tree<T>>>>
+pub fn list_of_depths<T>(tree: Tree<T>) -> Vec<Vec<Tree<T>>>
 where
     T: Clone,
 {
-    let mut results = vec![vec![]; tree_height(Some(&Box::new(tree.clone())))];
+    let mut results = vec![vec![]; tree_height(Some(&tree))];
     let mut queue = VecDeque::new();
-    queue.push_back((Box::new(tree), 0));
+    queue.push_back((tree, 0));
 
     while let Some((mut node, level)) = queue.pop_front() {
         if let Some(left) = node.left.take() {
-            queue.push_back((left, level + 1));
+            queue.push_back((*left, level + 1));
         }
         if let Some(right) = node.right.take() {
-            queue.push_back((right, level + 1));
+            queue.push_back((*right, level + 1));
         }
 
         results[level].push(node);
@@ -63,44 +63,44 @@ mod tests {
         assert_eq!(
             list_of_depths(tree),
             vec![
-                vec![Box::new(Tree {
+                vec![Tree {
                     data: 3,
                     left: None,
                     right: None,
-                })],
+                }],
                 vec![
-                    Box::new(Tree {
+                    Tree {
                         data: 4,
                         left: None,
                         right: None,
-                    }),
-                    Box::new(Tree {
+                    },
+                    Tree {
                         data: 6,
                         left: None,
                         right: None,
-                    })
+                    }
                 ],
                 vec![
-                    Box::new(Tree {
+                    Tree {
                         data: 1,
                         left: None,
                         right: None,
-                    }),
-                    Box::new(Tree {
+                    },
+                    Tree {
                         data: 2,
                         left: None,
                         right: None,
-                    }),
-                    Box::new(Tree {
+                    },
+                    Tree {
                         data: 8,
                         left: None,
                         right: None,
-                    }),
-                    Box::new(Tree {
+                    },
+                    Tree {
                         data: 9,
                         left: None,
                         right: None,
-                    })
+                    }
                 ]
             ]
         );

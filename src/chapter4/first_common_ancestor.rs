@@ -43,14 +43,14 @@ fn depth<'a, T>(node: &'a TreeNode<'a, T>) -> usize {
 }
 
 /// A node that contains both data and an id (in order to do comparisons).
-type Node<'a, T> = Option<&'a Box<Tree<(u32, T)>>>;
+type Node<'a, T> = Option<&'a Tree<(u32, T)>>;
 
 /// Solution if the tree nodes are not allowed access to the parent.
-pub fn common_ancestor<'a, T>(
-    tree: &'a Box<Tree<(u32, T)>>,
+pub fn common_ancestor<T>(
+    tree: &Tree<(u32, T)>,
     node1: u32,
     node2: u32,
-) -> Option<&'a Box<Tree<(u32, T)>>> {
+) -> Option<&Tree<(u32, T)>> {
     let (node, finished) = common_ancestor_rec(Some(tree), node1, node2);
 
     if !finished {
@@ -60,7 +60,7 @@ pub fn common_ancestor<'a, T>(
     }
 }
 
-fn common_ancestor_rec<'a, T>(tree: Node<'a, T>, node1: u32, node2: u32) -> (Node<'a, T>, bool) {
+fn common_ancestor_rec<T>(tree: Node<'_, T>, node1: u32, node2: u32) -> (Node<'_, T>, bool) {
     let node_id = tree.map(|n| n.data.0);
     if node_id.is_none() {
         return (tree, false);
@@ -70,12 +70,13 @@ fn common_ancestor_rec<'a, T>(tree: Node<'a, T>, node1: u32, node2: u32) -> (Nod
         return (tree, false);
     }
 
-    let (left, finished) = common_ancestor_rec(tree.and_then(|n| n.left.as_ref()), node1, node2);
+    let (left, finished) = common_ancestor_rec(tree.and_then(|n| n.left.as_deref()), node1, node2);
     if finished {
         return (left, finished);
     }
 
-    let (right, finished) = common_ancestor_rec(tree.and_then(|n| n.right.as_ref()), node1, node2);
+    let (right, finished) =
+        common_ancestor_rec(tree.and_then(|n| n.right.as_deref()), node1, node2);
     if finished {
         return (right, finished);
     }
@@ -95,7 +96,7 @@ mod tests {
 
     #[test]
     fn test_common_ancestor() {
-        let tree = Box::new(Tree {
+        let tree = Tree {
             data: (1, b'a'),
             left: Some(Box::new(Tree {
                 data: (2, b'b'),
@@ -123,7 +124,7 @@ mod tests {
                     right: None,
                 })),
             })),
-        });
+        };
 
         assert_eq!(common_ancestor(&tree, 4, 5).map(|n| n.data.0), Some(2));
         assert_eq!(common_ancestor(&tree, 4, 4).map(|n| n.data.0), Some(4));

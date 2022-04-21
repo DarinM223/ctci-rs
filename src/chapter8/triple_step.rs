@@ -12,7 +12,7 @@ pub fn triple_step_rec(steps: i32) -> i32 {
 /// Bottom up method which doesn't use any recursion and runs in around O(n) time.
 pub fn triple_step_bottom_up(steps: i32) -> i32 {
     let mut cached_steps = vec![0; steps as usize + 1];
-    for curr_steps in 0..(steps + 1) {
+    for curr_steps in 0..=steps {
         if curr_steps == 0 {
             cached_steps[curr_steps as usize] = 1;
         } else {

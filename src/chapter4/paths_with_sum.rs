@@ -4,19 +4,19 @@ use std::collections::HashMap;
 /// Brute force O(nlogn) recursive algorithm that counts the number of paths
 /// starting from the root node, then recursively calls itself on its left and right child
 /// and adds the paths together.
-pub fn paths_with_sum(tree: Option<&Box<Tree<i32>>>, target_sum: i32) -> i32 {
+pub fn paths_with_sum(tree: Option<&Tree<i32>>, target_sum: i32) -> i32 {
     if tree.is_none() {
         return 0;
     }
 
     let paths = paths_from_node(tree, target_sum, 0);
-    let left_paths = paths_with_sum(tree.and_then(|n| n.left.as_ref()), target_sum);
-    let right_paths = paths_with_sum(tree.and_then(|n| n.right.as_ref()), target_sum);
+    let left_paths = paths_with_sum(tree.and_then(|n| n.left.as_deref()), target_sum);
+    let right_paths = paths_with_sum(tree.and_then(|n| n.right.as_deref()), target_sum);
 
     paths + left_paths + right_paths
 }
 
-fn paths_from_node(tree: Option<&Box<Tree<i32>>>, target_sum: i32, current_sum: i32) -> i32 {
+fn paths_from_node(tree: Option<&Tree<i32>>, target_sum: i32, current_sum: i32) -> i32 {
     if let Some(node) = tree {
         let current_sum = current_sum + node.data;
 
@@ -25,8 +25,8 @@ fn paths_from_node(tree: Option<&Box<Tree<i32>>>, target_sum: i32, current_sum: 
             total_paths += 1;
         }
 
-        total_paths += paths_from_node(node.left.as_ref(), target_sum, current_sum);
-        total_paths += paths_from_node(node.right.as_ref(), target_sum, current_sum);
+        total_paths += paths_from_node(node.left.as_deref(), target_sum, current_sum);
+        total_paths += paths_from_node(node.right.as_deref(), target_sum, current_sum);
 
         total_paths
     } else {
@@ -35,12 +35,12 @@ fn paths_from_node(tree: Option<&Box<Tree<i32>>>, target_sum: i32, current_sum: 
 }
 
 /// O(n) time, O(log n) space solution.
-pub fn paths_with_sum_opt(tree: Option<&Box<Tree<i32>>>, target_sum: i32) -> i32 {
+pub fn paths_with_sum_opt(tree: Option<&Tree<i32>>, target_sum: i32) -> i32 {
     paths_with_sum_opt_rec(tree, target_sum, 0, &mut HashMap::new())
 }
 
 fn paths_with_sum_opt_rec(
-    tree: Option<&Box<Tree<i32>>>,
+    tree: Option<&Tree<i32>>,
     target_sum: i32,
     running_sum: i32,
     path_count: &mut HashMap<i32, i32>,
@@ -55,8 +55,8 @@ fn paths_with_sum_opt_rec(
         }
 
         increment_hash_table(path_count, running_sum, 1);
-        paths += paths_with_sum_opt_rec(node.left.as_ref(), target_sum, running_sum, path_count);
-        paths += paths_with_sum_opt_rec(node.right.as_ref(), target_sum, running_sum, path_count);
+        paths += paths_with_sum_opt_rec(node.left.as_deref(), target_sum, running_sum, path_count);
+        paths += paths_with_sum_opt_rec(node.right.as_deref(), target_sum, running_sum, path_count);
         increment_hash_table(path_count, running_sum, -1);
 
         paths
@@ -81,7 +81,7 @@ mod tests {
 
     #[test]
     fn test_paths_with_sum() {
-        let tree = Box::new(Tree {
+        let tree = Tree {
             data: 10,
             left: Some(Box::new(Tree {
                 data: 5,
@@ -117,7 +117,7 @@ mod tests {
                     right: None,
                 })),
             })),
-        });
+        };
 
         assert_eq!(
             paths_with_sum(Some(&tree), 8),

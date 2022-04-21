@@ -4,10 +4,10 @@ pub fn check_bst<T>(tree: Tree<T>) -> bool
 where
     T: PartialOrd + Copy,
 {
-    check_bst_rec(Some(&Box::new(tree)), None, None)
+    check_bst_rec(Some(&tree), None, None)
 }
 
-fn check_bst_rec<T>(tree: Option<&Box<Tree<T>>>, start: Option<T>, end: Option<T>) -> bool
+fn check_bst_rec<T>(tree: Option<&Tree<T>>, start: Option<T>, end: Option<T>) -> bool
 where
     T: PartialOrd + Copy,
 {
@@ -18,8 +18,8 @@ where
         if less_range || greater_range {
             false
         } else {
-            check_bst_rec(t.left.as_ref(), start, Some(t.data.clone()))
-                && check_bst_rec(t.right.as_ref(), Some(t.data.clone()), end)
+            check_bst_rec(t.left.as_deref(), start, Some(t.data.clone()))
+                && check_bst_rec(t.right.as_deref(), Some(t.data.clone()), end)
         }
     } else {
         true

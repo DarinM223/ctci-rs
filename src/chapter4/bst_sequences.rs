@@ -1,7 +1,7 @@
 use super::Tree;
 use std::collections::VecDeque;
 
-pub fn all_sequences<T>(node: Option<&Box<Tree<T>>>) -> Vec<VecDeque<T>>
+pub fn all_sequences<T>(node: Option<&Tree<T>>) -> Vec<VecDeque<T>>
 where
     T: Clone,
 {
@@ -15,8 +15,8 @@ where
     let mut prefix = VecDeque::new();
     node.map(|n| prefix.push_back(n.data.clone()));
 
-    let mut left_sequence = all_sequences(node.and_then(|n| n.left.as_ref()));
-    let mut right_sequence = all_sequences(node.and_then(|n| n.right.as_ref()));
+    let mut left_sequence = all_sequences(node.and_then(|n| n.left.as_deref()));
+    let mut right_sequence = all_sequences(node.and_then(|n| n.right.as_deref()));
 
     for left in left_sequence.iter_mut() {
         for right in right_sequence.iter_mut() {
@@ -85,7 +85,7 @@ mod tests {
             })),
         };
 
-        let sequences = all_sequences(Some(&Box::new(tree)));
+        let sequences = all_sequences(Some(&tree));
         assert_eq!(
             sequences,
             vec![

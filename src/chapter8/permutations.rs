@@ -15,7 +15,7 @@ pub fn permutations(s: &mut Vec<u8>) -> Vec<Vec<u8>> {
 }
 
 fn append_to_permutation(permutation: &Vec<u8>, ch: u8, appended_perms: &mut Vec<Vec<u8>>) {
-    for pos in 0..permutation.len() + 1 {
+    for pos in 0..=permutation.len() {
         let mut permutation = permutation.clone();
         permutation.insert(pos, ch);
         appended_perms.push(permutation);

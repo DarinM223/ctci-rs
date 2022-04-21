@@ -66,13 +66,13 @@ pub struct Tree<T> {
     right: Option<Box<Tree<T>>>,
 }
 
-pub fn tree_height<T>(tree: Option<&Box<Tree<T>>>) -> usize {
+pub fn tree_height<T>(tree: Option<&Tree<T>>) -> usize {
     if tree.is_none() {
         return 0;
     }
 
-    let left = tree_height(tree.and_then(|n| n.left.as_ref()));
-    let right = tree_height(tree.and_then(|n| n.right.as_ref()));
+    let left = tree_height(tree.and_then(|n| n.left.as_deref()));
+    let right = tree_height(tree.and_then(|n| n.right.as_deref()));
 
     cmp::max(left, right) + 1
 }

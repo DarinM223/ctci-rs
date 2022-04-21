@@ -36,6 +36,6 @@ mod tests {
     #[test]
     fn test_min_tree() {
         let odd_list = vec![1, 2, 3, 6, 10];
-        assert_eq!(tree_height(min_tree(&odd_list).as_ref()), 3);
+        assert_eq!(tree_height(min_tree(&odd_list).as_deref()), 3);
     }
 }
