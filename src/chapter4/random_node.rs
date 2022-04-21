@@ -36,14 +36,14 @@ where
     /// Helper function used by OptRandTree in order to get the ith
     /// in order node in the tree.
     pub fn get_ith(&self, i: i32) -> Option<RandTree<T>> {
-        let left_size = self.left.as_ref().map(|n| n.size).unwrap_or(0);
+        let left_size = self.left.as_deref().map(|n| n.size).unwrap_or(0);
         if i < left_size {
-            self.left.as_ref().and_then(|n| n.get_ith(i))
+            self.left.as_deref().and_then(|n| n.get_ith(i))
         } else if i > left_size {
             // Subtract the left nodes from i so that when get_ith is called again
             // on the right node it can correctly check the left node for the size.
             self.right
-                .as_ref()
+                .as_deref()
                 .and_then(|n| n.get_ith(i - (left_size + 1)))
         } else {
             Some(self.clone())
@@ -76,16 +76,16 @@ where
     /// to be right_size / total_size and the probability of the random
     /// node being the head to be 1 / total_size.
     fn random_node(&self) -> Option<RandTree<T>> {
-        let left_size = self.left.as_ref().map(|n| n.size).unwrap_or(0);
+        let left_size = self.left.as_deref().map(|n| n.size).unwrap_or(0);
 
         let between = Range::new(0, self.size);
         let mut rng = rand::thread_rng();
         let index = between.ind_sample(&mut rng);
 
         if index < left_size {
-            self.left.as_ref().and_then(|n| n.random_node())
+            self.left.as_deref().and_then(|n| n.random_node())
         } else if index > left_size {
-            self.right.as_ref().and_then(|n| n.random_node())
+            self.right.as_deref().and_then(|n| n.random_node())
         } else {
             Some(self.clone())
         }
@@ -113,9 +113,9 @@ where
         if d == self.node_data {
             Some(self.clone())
         } else if d <= self.node_data {
-            self.left.as_ref().and_then(|n| n.find(d))
+            self.left.as_deref().and_then(|n| n.find(d))
         } else if d > self.node_data {
-            self.right.as_ref().and_then(|n| n.find(d))
+            self.right.as_deref().and_then(|n| n.find(d))
         } else {
             None
         }

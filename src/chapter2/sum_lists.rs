@@ -72,8 +72,8 @@ fn sum_lists_rev_helper(
         return (None, 0);
     }
 
-    let l1_val = l1.as_ref().map(|n| n.data).unwrap_or(0);
-    let l2_val = l2.as_ref().map(|n| n.data).unwrap_or(0);
+    let l1_val = l1.as_deref().map(|n| n.data).unwrap_or(0);
+    let l2_val = l2.as_deref().map(|n| n.data).unwrap_or(0);
     let (prev_node, prev_carry) =
         sum_lists_rev_helper(l1.and_then(|n| n.next), l2.and_then(|n| n.next));
     let result = l1_val + l2_val + prev_carry;
