@@ -32,8 +32,8 @@ pub fn sum_lists_rev(
     l1: Option<Box<Node<i32>>>,
     l2: Option<Box<Node<i32>>>,
 ) -> Option<Box<Node<i32>>> {
-    let l1_len = list_len(&l1);
-    let l2_len = list_len(&l2);
+    let l1_len = list_len(l1.as_deref());
+    let l2_len = list_len(l2.as_deref());
 
     let (padded_l1, padded_l2) = if l1_len < l2_len {
         (pad_list(l1, l2_len - l1_len), l2)
@@ -53,9 +53,9 @@ pub fn sum_lists_rev(
 }
 
 /// Returns the length of the list
-fn list_len(l: &Option<Box<Node<i32>>>) -> usize {
+fn list_len(l: Option<&Node<i32>>) -> usize {
     let mut len = 0;
-    let mut head = l.as_deref();
+    let mut head = l;
     while let Some(node) = head {
         len += 1;
         head = node.next.as_deref();

@@ -1,6 +1,6 @@
 use super::Tree;
 
-pub fn min_tree<T>(arr: &Vec<T>) -> Option<Box<Tree<T>>>
+pub fn min_tree<T>(arr: &[T]) -> Option<Box<Tree<T>>>
 where
     T: Clone,
 {
@@ -8,7 +8,7 @@ where
 }
 
 /// Note: the start and end indexes must be integers because they can be negative.
-fn min_tree_rec<T>(arr: &Vec<T>, start: i32, end: i32) -> Option<Box<Tree<T>>>
+fn min_tree_rec<T>(arr: &[T], start: i32, end: i32) -> Option<Box<Tree<T>>>
 where
     T: Clone,
 {

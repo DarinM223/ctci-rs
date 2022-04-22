@@ -6,22 +6,6 @@ pub struct Node<'a, T> {
 
 pub type Ref<'a, T> = Option<&'a Node<'a, T>>;
 
-#[macro_export]
-macro_rules! ref_list {
-    ($x:expr) => {{
-        Some(&Node {
-            data: $x,
-            next: None,
-        })
-    }};
-    ($x:expr, $($rest:tt)*) => {{
-        Some(&Node {
-            data: $x,
-            next: ref_list!($($rest)*),
-        })
-    }};
-}
-
 pub fn as_ptr<T>(r: Ref<'_, T>) -> Option<*const Node<'_, T>> {
     r.map(|n| n as *const Node<'_, T>)
 }
@@ -71,6 +55,14 @@ mod tests {
 
     #[test]
     fn test_intersection() {
+        // Diagram of linked list in test case:
+        //
+        //  3  --  8
+        //
+        //  5  --  9  --  7  --  2  --  1
+        //               /
+        //      6  --  4
+        //
         let node1 = Node {
             data: 1,
             next: None,
@@ -79,46 +71,43 @@ mod tests {
             data: 2,
             next: Some(&node1),
         };
-        let node3 = Node {
+        let node7 = Node {
             data: 7,
             next: Some(&node2),
         };
-
-        let node4 = Node {
+        let node9 = Node {
             data: 9,
-            next: Some(&node3),
+            next: Some(&node7),
         };
         let node5 = Node {
             data: 5,
+            next: Some(&node9),
+        };
+        let node4 = Node {
+            data: 4,
+            next: Some(&node7),
+        };
+        let node6 = Node {
+            data: 6,
             next: Some(&node4),
         };
-
-        let node6 = Node {
-            data: 4,
-            next: Some(&node3),
-        };
-        let node7 = Node {
-            data: 6,
-            next: Some(&node6),
-        };
-
         let node8 = Node {
-            data: 1,
+            data: 8,
             next: None,
         };
-        let node9 = Node {
-            data: 2,
+        let node3 = Node {
+            data: 3,
             next: Some(&node8),
         };
 
         assert_eq!(
-            as_ptr(intersection(Some(&node5), Some(&node7))),
-            as_ptr(Some(&node3))
+            as_ptr(intersection(Some(&node5), Some(&node6))),
+            as_ptr(Some(&node7))
         );
         assert_eq!(
-            as_ptr(intersection(Some(&node7), Some(&node2))),
+            as_ptr(intersection(Some(&node6), Some(&node2))),
             as_ptr(Some(&node2))
         );
-        assert_eq!(as_ptr(intersection(Some(&node5), Some(&node9))), None);
+        assert_eq!(as_ptr(intersection(Some(&node5), Some(&node3))), None);
     }
 }
