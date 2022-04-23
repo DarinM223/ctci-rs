@@ -1,4 +1,4 @@
-use super::delete_middle_node::Node;
+use super::Node;
 use std::collections::HashSet;
 use std::hash::Hash;
 
@@ -26,7 +26,7 @@ fn remove_duplicates_rec<T: Hash + Eq + Clone>(
 
 #[cfg(test)]
 mod tests {
-    use super::super::delete_middle_node::{list_from_vec, vec_from_list};
+    use super::super::{list_from_vec, vec_from_list};
     use super::*;
 
     #[test]

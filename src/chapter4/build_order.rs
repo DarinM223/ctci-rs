@@ -1,5 +1,14 @@
-use super::{GraphKey, GraphNode, GraphNodes};
+use slotmap::{new_key_type, SlotMap};
 use std::collections::HashMap;
+
+new_key_type! { pub struct GraphKey; }
+/// A graph node for an adjacency list graph structure.
+pub struct GraphNode<T> {
+    pub data: T,
+    pub edges: Vec<GraphKey>,
+}
+
+pub type GraphNodes<T> = SlotMap<GraphKey, GraphNode<T>>;
 
 pub fn find_projects(
     projects: Vec<String>,

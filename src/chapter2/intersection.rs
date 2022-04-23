@@ -1,3 +1,5 @@
+use std::ptr;
+
 #[derive(Debug, Clone, Copy)]
 pub struct Node<'a, T> {
     pub data: T,
@@ -6,14 +8,16 @@ pub struct Node<'a, T> {
 
 pub type Ref<'a, T> = Option<&'a Node<'a, T>>;
 
-pub fn as_ptr<T>(r: Ref<'_, T>) -> Option<*const Node<'_, T>> {
-    r.map(|n| n as *const Node<'_, T>)
+impl<'a, T> PartialEq for &'a Node<'a, T> {
+    fn eq(&self, other: &Self) -> bool {
+        ptr::eq(*self, *other)
+    }
 }
 
 pub fn intersection<'a, T>(mut l1: Ref<'a, T>, mut l2: Ref<'a, T>) -> Ref<'a, T> {
     let (l1_tail, len1) = get_tail_and_size(l1);
     let (l2_tail, len2) = get_tail_and_size(l2);
-    if as_ptr(l1_tail) != as_ptr(l2_tail) {
+    if l1_tail != l2_tail {
         return None;
     }
 
@@ -28,7 +32,7 @@ pub fn intersection<'a, T>(mut l1: Ref<'a, T>, mut l2: Ref<'a, T>) -> Ref<'a, T>
     }
 
     while l1.is_some() && l2.is_some() {
-        if as_ptr(l1) == as_ptr(l2) {
+        if l1 == l2 {
             return l1;
         }
 
@@ -51,7 +55,7 @@ fn get_tail_and_size<T>(l: Ref<'_, T>) -> (Ref<'_, T>, i32) {
 
 #[cfg(test)]
 mod tests {
-    use super::{as_ptr, intersection, Node};
+    use super::{intersection, Node};
 
     #[test]
     fn test_intersection() {
@@ -99,15 +103,8 @@ mod tests {
             data: 3,
             next: Some(&node8),
         };
-
-        assert_eq!(
-            as_ptr(intersection(Some(&node5), Some(&node6))),
-            as_ptr(Some(&node7))
-        );
-        assert_eq!(
-            as_ptr(intersection(Some(&node6), Some(&node2))),
-            as_ptr(Some(&node2))
-        );
-        assert_eq!(as_ptr(intersection(Some(&node5), Some(&node3))), None);
+        assert_eq!(intersection(Some(&node5), Some(&node6)), Some(&node7));
+        assert_eq!(intersection(Some(&node6), Some(&node2)), Some(&node2));
+        assert_eq!(intersection(Some(&node5), Some(&node3)), None);
     }
 }

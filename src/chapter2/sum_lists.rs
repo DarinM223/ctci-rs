@@ -1,4 +1,4 @@
-use super::delete_middle_node::Node;
+use super::Node;
 
 /// This function is easiest to implement recursively.
 /// The main difficulty is safely handling different sized lists.
@@ -100,7 +100,7 @@ fn pad_list(l: Option<Box<Node<i32>>>, padding: usize) -> Option<Box<Node<i32>>>
 
 #[cfg(test)]
 mod tests {
-    use super::super::delete_middle_node::{list_from_vec, vec_from_list};
+    use super::super::{list_from_vec, vec_from_list};
     use super::*;
 
     #[test]

@@ -1,4 +1,4 @@
-use super::delete_middle_node::Node;
+use super::Node;
 
 pub fn kth_to_last<T>(k: u32, node: Option<&Node<T>>) -> Option<&Node<T>> {
     let mut start = node;
@@ -35,7 +35,7 @@ pub fn kth_to_last_rec<T>(k: u32, node: Option<&Node<T>>) -> (u32, Option<&Node<
 
 #[cfg(test)]
 mod tests {
-    use super::super::delete_middle_node::{list_from_vec, Node};
+    use super::super::{list_from_vec, Node};
     use super::{kth_to_last, kth_to_last_rec};
 
     #[test]

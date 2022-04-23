@@ -1,4 +1,4 @@
-use super::delete_middle_node::Node;
+use super::Node;
 
 /// Uses a stack to save the linked list data so that popping from
 /// the stack will give the reversed data one at a time.
@@ -28,7 +28,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::super::delete_middle_node::list_from_vec;
+    use super::super::list_from_vec;
     use super::is_palindrome;
 
     #[test]
