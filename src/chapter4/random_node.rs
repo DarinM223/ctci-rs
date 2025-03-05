@@ -215,6 +215,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(miri, ignore)]
     fn test_random_node() {
         let mut set = make_hash_set(vec![3, 1, 4, 8, 6, 9]);
         let mut tree = RandTree::new(5);
@@ -234,6 +235,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(miri, ignore)]
     fn test_optimized_random_node() {
         let mut set = make_hash_set(vec![3, 1, 4, 8, 6, 9]);
         let mut tree = OptRandTree::new(5);
