@@ -1,11 +1,11 @@
 /// Completely recursive way which is around O(3^n) time complexity.
 pub fn triple_step_rec(steps: i32) -> i32 {
-    if steps < 0 {
-        0
-    } else if steps == 0 {
-        1
-    } else {
-        triple_step_rec(steps - 1) + triple_step_rec(steps - 2) + triple_step_rec(steps - 3)
+    match steps.cmp(&0) {
+        std::cmp::Ordering::Less => 0,
+        std::cmp::Ordering::Equal => 1,
+        std::cmp::Ordering::Greater => {
+            triple_step_rec(steps - 1) + triple_step_rec(steps - 2) + triple_step_rec(steps - 3)
+        }
     }
 }
 

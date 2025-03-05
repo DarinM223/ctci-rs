@@ -1,4 +1,4 @@
-use super::{tree_height, Tree};
+use super::{Tree, tree_height};
 use std::collections::VecDeque;
 
 pub fn list_of_depths<T>(tree: Tree<T>) -> Vec<Vec<Tree<T>>>

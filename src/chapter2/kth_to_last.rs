@@ -7,9 +7,7 @@ pub fn kth_to_last<T>(k: u32, node: Option<&Node<T>>) -> Option<&Node<T>> {
     for _ in 0..k {
         end = end.and_then(|n| n.next.as_deref());
     }
-    if end.is_none() {
-        return None;
-    }
+    end?;
 
     while let Some(node) = end {
         end = node.next.as_deref();
@@ -35,7 +33,7 @@ pub fn kth_to_last_rec<T>(k: u32, node: Option<&Node<T>>) -> (u32, Option<&Node<
 
 #[cfg(test)]
 mod tests {
-    use super::super::{list_from_vec, Node};
+    use super::super::{Node, list_from_vec};
     use super::{kth_to_last, kth_to_last_rec};
 
     #[test]

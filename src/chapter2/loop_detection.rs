@@ -59,9 +59,7 @@ pub fn find_beginning<'a, T>(l: &'a Node<'a, T>) -> Option<&'a Node<'a, T>> {
     }
 
     // Return early if not loop.
-    if faster.is_none() {
-        return None;
-    }
+    faster?;
 
     // Get intersection starting from the intersected node and the head of the list.
     let mut start = Some(l);

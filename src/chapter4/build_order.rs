@@ -1,4 +1,4 @@
-use slotmap::{new_key_type, SlotMap};
+use slotmap::{SlotMap, new_key_type};
 use std::collections::HashMap;
 
 new_key_type! { pub struct GraphKey; }
@@ -62,7 +62,9 @@ impl Graph {
         if let (Some(&n1), Some(&n2)) = (self.map.get(&start), self.map.get(&end)) {
             if !nodes[n1].edges.contains(&n2) {
                 nodes[n1].edges.push(n2);
-                self.dependencies.get_mut(&n2).map(|d| *d += 1);
+                if let Some(d) = self.dependencies.get_mut(&n2) {
+                    *d += 1;
+                }
             }
         }
     }
@@ -81,7 +83,9 @@ fn order_projects(graph: &mut Graph, nodes: &mut GraphNodes<String>) -> Vec<Grap
         // Decrement the children's dependencies and add
         // the children with no dependencies.
         for child in nodes[project].edges.iter() {
-            graph.dependencies.get_mut(child).map(|d| *d -= 1);
+            if let Some(d) = graph.dependencies.get_mut(child) {
+                *d -= 1;
+            }
         }
         add_non_dependants(&mut order, &nodes[project].edges, &graph.dependencies);
 

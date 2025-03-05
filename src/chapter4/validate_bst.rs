@@ -12,8 +12,8 @@ where
     T: PartialOrd + Copy,
 {
     if let Some(t) = tree {
-        let less_range = start.map_or(false, |d| t.data <= d);
-        let greater_range = end.map_or(false, |d| t.data > d);
+        let less_range = start.is_some_and(|d| t.data <= d);
+        let greater_range = end.is_some_and(|d| t.data > d);
 
         if less_range || greater_range {
             false

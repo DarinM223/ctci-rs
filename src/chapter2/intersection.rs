@@ -55,7 +55,7 @@ fn get_tail_and_size<T>(l: Ref<'_, T>) -> (Ref<'_, T>, i32) {
 
 #[cfg(test)]
 mod tests {
-    use super::{intersection, Node};
+    use super::{Node, intersection};
 
     #[test]
     fn test_intersection() {

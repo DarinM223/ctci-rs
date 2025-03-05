@@ -18,7 +18,9 @@ impl<T> SetOfStacks<T> {
             self.stacks.push(VecDeque::with_capacity(self.capacity));
         }
 
-        self.stacks.last_mut().map(move |s| s.push_back(data));
+        if let Some(s) = self.stacks.last_mut() {
+            s.push_back(data);
+        }
     }
 
     pub fn pop(&mut self) -> Option<T> {

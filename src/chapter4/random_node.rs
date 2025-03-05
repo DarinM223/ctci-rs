@@ -37,16 +37,16 @@ where
     /// in order node in the tree.
     pub fn get_ith(&self, i: i32) -> Option<RandTree<T>> {
         let left_size = self.left.as_deref().map(|n| n.size).unwrap_or(0);
-        if i < left_size {
-            self.left.as_deref().and_then(|n| n.get_ith(i))
-        } else if i > left_size {
-            // Subtract the left nodes from i so that when get_ith is called again
-            // on the right node it can correctly check the left node for the size.
-            self.right
-                .as_deref()
-                .and_then(|n| n.get_ith(i - (left_size + 1)))
-        } else {
-            Some(self.clone())
+        match i.cmp(&left_size) {
+            std::cmp::Ordering::Less => self.left.as_deref().and_then(|n| n.get_ith(i)),
+            std::cmp::Ordering::Greater => {
+                // Subtract the left nodes from i so that when get_ith is called again
+                // on the right node it can correctly check the left node for the size.
+                self.right
+                    .as_deref()
+                    .and_then(|n| n.get_ith(i - (left_size + 1)))
+            }
+            std::cmp::Ordering::Equal => Some(self.clone()),
         }
     }
 }
@@ -82,12 +82,10 @@ where
         let mut rng = rand::thread_rng();
         let index = between.ind_sample(&mut rng);
 
-        if index < left_size {
-            self.left.as_deref().and_then(|n| n.random_node())
-        } else if index > left_size {
-            self.right.as_deref().and_then(|n| n.random_node())
-        } else {
-            Some(self.clone())
+        match index.cmp(&left_size) {
+            std::cmp::Ordering::Less => self.left.as_deref().and_then(|n| n.random_node()),
+            std::cmp::Ordering::Greater => self.right.as_deref().and_then(|n| n.random_node()),
+            std::cmp::Ordering::Equal => Some(self.clone()),
         }
     }
 

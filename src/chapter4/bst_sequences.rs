@@ -13,7 +13,9 @@ where
     }
 
     let mut prefix = VecDeque::new();
-    node.map(|n| prefix.push_back(n.data.clone()));
+    if let Some(n) = node {
+        prefix.push_back(n.data.clone());
+    }
 
     let mut left_sequence = all_sequences(node.and_then(|n| n.left.as_deref()));
     let mut right_sequence = all_sequences(node.and_then(|n| n.right.as_deref()));

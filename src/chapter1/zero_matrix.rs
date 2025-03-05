@@ -28,13 +28,39 @@ pub fn zero_matrix(matrix: &mut [Vec<i32>]) {
     }
 
     for row in zero_rows {
-        for col in 0..matrix[0].len() {
-            matrix[row][col] = 0;
+        for col in matrix[row].iter_mut() {
+            *col = 0;
         }
     }
     for col in zero_cols {
-        for row in 0..matrix.len() {
-            matrix[row][col] = 0;
+        for row in matrix.iter_mut() {
+            row[col] = 0;
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::zero_matrix;
+
+    #[test]
+    fn test_zero_matrix() {
+        let mut matrix = [
+            vec![0, 1, 1, 1],
+            vec![1, 1, 1, 1],
+            vec![1, 1, 0, 0],
+            vec![1, 1, 1, 1],
+        ];
+
+        zero_matrix(&mut matrix[..]);
+
+        let zero_matrix = [
+            vec![0, 0, 0, 0],
+            vec![0, 1, 0, 0],
+            vec![0, 0, 0, 0],
+            vec![0, 1, 0, 0],
+        ];
+
+        assert_eq!(matrix, zero_matrix);
     }
 }

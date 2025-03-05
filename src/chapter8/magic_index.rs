@@ -11,12 +11,10 @@ fn magic_distinct_rec(arr: &Vec<i32>, start: i32, end: i32) -> i32 {
     }
 
     let mid = (start + end) / 2;
-    if arr[mid as usize] == mid {
-        mid
-    } else if arr[mid as usize] > mid {
-        magic_distinct_rec(arr, start, mid - 1)
-    } else {
-        magic_distinct_rec(arr, mid + 1, end)
+    match arr[mid as usize].cmp(&mid) {
+        cmp::Ordering::Equal => mid,
+        cmp::Ordering::Greater => magic_distinct_rec(arr, start, mid - 1),
+        cmp::Ordering::Less => magic_distinct_rec(arr, mid + 1, end),
     }
 }
 
@@ -43,9 +41,7 @@ fn magic_nondistinct_rec(arr: &Vec<i32>, start: i32, end: i32) -> i32 {
     }
 
     let right_index = cmp::max(mid_index + 1, value);
-    let right = magic_nondistinct_rec(arr, right_index, end);
-
-    right
+    magic_nondistinct_rec(arr, right_index, end)
 }
 
 #[cfg(test)]
